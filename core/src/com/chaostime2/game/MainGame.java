@@ -5,57 +5,68 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
+	private OrthographicCamera camera;
+	private Viewport viewport;
 	private Texture playerImg;
 	private Rectangle player;
+
 	float playerVelocityX = 0;
 	float playerVelocityY = 0;
+	int playerVelocity = 100;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		playerImg = new Texture("player.png");
 
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 1920, 1080);
+
 		player = new Rectangle();
-		player.x = 910;
-		player.y = 490;
+		player.x = 960 - (player.width / 2);
+		player.y = 540 - (player.height / 2);
 		player.width = 100;
 		player.height = 100;
 	}
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(0, 0, 0, 1);
+		ScreenUtils.clear(255, 255, 255, 1);
 
+		camera.update();
 		batch.begin();
 		batch.draw(playerImg, player.x, player.y);
 		batch.end();
 
 		boolean movingX = false, movingY = false;
 
-		//if D key is pressed
 		if(Gdx.input.isKeyPressed(Keys.D)) {
-			playerVelocityX = 100;
+			playerVelocityX = playerVelocity;
 			movingX = true;
 		}
-		//if A key is pressed
 		if(Gdx.input.isKeyPressed(Keys.A)) {
-			playerVelocityX = -100;
+			playerVelocityX = -playerVelocity;
 			movingX = true;
 		}
-		//if W key is pressed
 		if(Gdx.input.isKeyPressed(Keys.W)) {
-			playerVelocityY = 100;
+			playerVelocityY = playerVelocity;
 			movingY = true;
 		}
-		//if S key is pressed
 		if(Gdx.input.isKeyPressed(Keys.S)) {
-			playerVelocityY = -100;
+			playerVelocityY = -playerVelocity;
 			movingY = true;
 		}
+
+		if(player.x < 0) player.x = 0;
+		if(player.x > 1920 - player.width) player.x = 1920 - player.width;
+		if(player.y < 0) player.y = 0;
+		if(player.y > 1080 - player.height) player.y = 1080 - player.height;
 
 		float delta = Gdx.graphics.getDeltaTime();
 

@@ -35,40 +35,49 @@ public class MainGame extends ApplicationAdapter {
 		batch.end();
 
 		float delta = Gdx.graphics.getDeltaTime();
+		boolean movingX = false, movingY = false;
+
+		//if D key is pressed
+		if(Gdx.input.isKeyPressed(Keys.D)) {
+			playerVelocityX = 100;
+			movingX = true;
+		}
+		//if A key is pressed
+		if(Gdx.input.isKeyPressed(Keys.A)) {
+			playerVelocityX = -100;
+			movingX = true;
+		}
+		//if W key is pressed
+		if(Gdx.input.isKeyPressed(Keys.W)) {
+			playerVelocityY = 100;
+			movingY = true;
+		}
+		//if S key is pressed
+		if(Gdx.input.isKeyPressed(Keys.S)) {
+			playerVelocityY = -100;
+			movingY = true;
+		}
 
 		player.x += playerVelocityX * delta;
 		player.y += playerVelocityY * delta;
 
-		//returns the velocity to zero slowly
-		//Math.min is used to make sure the velocity will return to exactly 0
-		if (playerVelocityX > 0) {
-			playerVelocityX -= Math.min(0.1f, playerVelocityX);
+		//returns the velocity to zero slowly if no inputs
+		//Math.min is used to make sure the velocity will return to 0 instead of "overshooting"
+		if (playerVelocityX > 0 && !movingX) {
+			playerVelocityX -= 400 * delta;
+			if (playerVelocityX < 0) playerVelocityX = 0;
 		}
-		if (playerVelocityX < 0) {
-			playerVelocityX += Math.min(0.1f, -playerVelocityX);
+		if (playerVelocityX < 0 && !movingX) {
+			playerVelocityX += 400 * delta;
+			if (playerVelocityX > 0) playerVelocityX = 0;
 		}
-		if (playerVelocityY > 0) {
-			playerVelocityY -= Math.min(0.1f, playerVelocityY);
+		if (playerVelocityY > 0 && !movingY) {
+			playerVelocityY -= 400 * delta;
+			if (playerVelocityY < 0) playerVelocityY = 0;
 		}
-		if (playerVelocityY < 0) {
-			playerVelocityY += Math.min(0.1f, -playerVelocityY);
-		}
-
-		//if D key is pressed
-		if(Gdx.input.isKeyPressed(Keys.D) && playerVelocityX <= 1000) {
-			playerVelocityX += 200 * delta;
-		}
-		//if A key is pressed
-		if(Gdx.input.isKeyPressed(Keys.A) && playerVelocityX >= -1000) {
-			playerVelocityX -= 200 * delta;
-		}
-		//if W key is pressed
-		if(Gdx.input.isKeyPressed(Keys.W)) {
-			player.y += 200 * Gdx.graphics.getDeltaTime();
-		}
-		//if S key is pressed
-		if(Gdx.input.isKeyPressed(Keys.S)) {
-			player.y -= 200 * Gdx.graphics.getDeltaTime();
+		if (playerVelocityY < 0 && !movingY) {
+			playerVelocityY += 400 * delta;
+			if (playerVelocityY > 0) playerVelocityY = 0;
 		}
 	}
 	

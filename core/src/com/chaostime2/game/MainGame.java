@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -27,6 +28,7 @@ public class MainGame extends ApplicationAdapter {
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1920, 1080);
+		viewport = new FitViewport(1920, 1080, camera);
 
 		player = new Rectangle();
 		player.x = 960 - (player.width / 2);
@@ -92,7 +94,11 @@ public class MainGame extends ApplicationAdapter {
 			if (playerVelocityY > 0) playerVelocityY = 0;
 		}
 	}
-	
+
+	public void resize(int width, int height) {
+		viewport.update(width, height);
+	}
+
 	@Override
 	public void dispose () {
 		batch.dispose();

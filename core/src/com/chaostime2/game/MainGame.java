@@ -34,7 +34,6 @@ public class MainGame extends ApplicationAdapter {
 		batch.draw(playerImg, player.x, player.y);
 		batch.end();
 
-		float delta = Gdx.graphics.getDeltaTime();
 		boolean movingX = false, movingY = false;
 
 		//if D key is pressed
@@ -57,6 +56,8 @@ public class MainGame extends ApplicationAdapter {
 			playerVelocityY = -100;
 			movingY = true;
 		}
+
+		float delta = Gdx.graphics.getDeltaTime();
 
 		player.x += playerVelocityX * delta;
 		player.y += playerVelocityY * delta;

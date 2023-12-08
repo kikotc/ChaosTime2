@@ -12,8 +12,8 @@ public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture playerImg;
 	private Rectangle player;
-	float playerVeloX = 0;
-	float playerVeloY = 0;
+	float playerVelocityX = 0;
+	float playerVelocityY = 0;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -29,16 +29,38 @@ public class MainGame extends ApplicationAdapter {
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
+
 		batch.begin();
-		batch.draw(playerImg, player.x + (playerVeloX * Gdx.graphics.getDeltaTime()), player.y + (playerVeloY * Gdx.graphics.getDeltaTime()));
+		batch.draw(playerImg, player.x, player.y);
 		batch.end();
+
+		float delta = Gdx.graphics.getDeltaTime();
+
+		player.x += playerVelocityX * delta;
+		player.y += playerVelocityY * delta;
+
+		//returns the velocity to zero slowly
+		//Math.min is used to make sure the velocity will return to exactly 0
+		if (playerVelocityX > 0) {
+			playerVelocityX -= Math.min(0.1f, playerVelocityX);
+		}
+		if (playerVelocityX < 0) {
+			playerVelocityX += Math.min(0.1f, -playerVelocityX);
+		}
+		if (playerVelocityY > 0) {
+			playerVelocityY -= Math.min(0.1f, playerVelocityY);
+		}
+		if (playerVelocityY < 0) {
+			playerVelocityY += Math.min(0.1f, -playerVelocityY);
+		}
+
 		//if D key is pressed
-		if(Gdx.input.isKeyPressed(Keys.D)) {
-			player.x += 200 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.D) && playerVelocityX <= 1000) {
+			playerVelocityX += 200 * delta;
 		}
 		//if A key is pressed
-		if(Gdx.input.isKeyPressed(Keys.A)) {
-			player.x -= 200 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.A) && playerVelocityX >= -1000) {
+			playerVelocityX -= 200 * delta;
 		}
 		//if W key is pressed
 		if(Gdx.input.isKeyPressed(Keys.W)) {

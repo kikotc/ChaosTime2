@@ -28,9 +28,13 @@ public class MainGame extends ApplicationAdapter {
 	//player variables
 	private Texture playerImg;
 	private Circle player;
-	private float playerVelocityX = 0;
-	private float playerVelocityY = 0;
-	private int playerVelocity = 90;
+	private Vector2 playerDirection = new Vector2();
+	private Vector2 playerVelocity = new Vector2();
+	private int playerSpeed = 140;
+
+	private int playerHealth = 200;
+	
+
 	private Texture teleportImg;
 	private Circle teleport;
 	boolean teleportPlaced = false;
@@ -39,7 +43,8 @@ public class MainGame extends ApplicationAdapter {
 	private Texture enemyImg;
 	private Array<Circle> enemies;
 	private long lastEnemyTime;
-	private int enemyVelocity = 120;
+	private long lastDamageTime = 0;
+	private int enemySpeed = 120;
 
 	@Override
 	public void create () {
@@ -76,7 +81,6 @@ public class MainGame extends ApplicationAdapter {
 		}
 		batch.end();
 
-		Vector2 playerDirection = new Vector2(0,0);
 		float delta = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
@@ -112,27 +116,31 @@ public class MainGame extends ApplicationAdapter {
 				movingY = true;
 			}
 
-			//moving the player (position = velocity * percent in direction * time)
-			playerDirection.nor();
-			player.x += playerVelocity * playerDirection.x * delta;
-			player.y += playerVelocity * playerDirection.y * delta;
+			//moving the player (position = speed * vector (percent in each direction) * time)
+			if (movingX || movingY) {
+				playerDirection.nor();
+				playerVelocity.x = playerSpeed * playerDirection.x;
+				playerVelocity.y = playerSpeed * playerDirection.y;
+			}
+			player.x += playerVelocity.x * delta;
+			player.y += playerVelocity.y * delta;
 
-			//returns the velocity to zero slowly if no inputs
-			if (playerVelocityX > 0 && !movingX) {
-				playerVelocityX -= 400 * delta;
-				if (playerVelocityX < 0) playerVelocityX = 0;
+			//dampen player movement
+			if (playerVelocity.x > 0 && !movingX) {
+				playerVelocity.x -= 300 * delta;
+				if (playerVelocity.x < 0) playerVelocity.x = 0;
 			}
-			if (playerVelocityX < 0 && !movingX) {
-				playerVelocityX += 400 * delta;
-				if (playerVelocityX > 0) playerVelocityX = 0;
+			if (playerVelocity.x < 0 && !movingX) {
+				playerVelocity.x += 300 * delta;
+				if (playerVelocity.x > 0) playerVelocity.x = 0;
 			}
-			if (playerVelocityY > 0 && !movingY) {
-				playerVelocityY -= 400 * delta;
-				if (playerVelocityY < 0) playerVelocityY = 0;
+			if (playerVelocity.y > 0 && !movingY) {
+				playerVelocity.y -= 300 * delta;
+				if (playerVelocity.y < 0) playerVelocity.y = 0;
 			}
-			if (playerVelocityY < 0 && !movingY) {
-				playerVelocityY += 400 * delta;
-				if (playerVelocityY > 0) playerVelocityY = 0;
+			if (playerVelocity.y < 0 && !movingY) {
+				playerVelocity.y += 300 * delta;
+				if (playerVelocity.y > 0) playerVelocity.y = 0;
 			}
 		}
 
@@ -140,12 +148,21 @@ public class MainGame extends ApplicationAdapter {
 		if(time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
 		for (Iterator<Circle> iter = enemies.iterator();iter.hasNext();) {
 			Circle enemyI = iter.next();
+
+			//individual enemy movement
 			Vector2 direction = new Vector2();
 			direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
 			direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
 			direction.nor();
-			enemyI.x += direction.x * enemyVelocity * delta;
-			enemyI.y += direction.y * enemyVelocity * delta;
+			enemyI.x += direction.x * enemySpeed * delta;
+			enemyI.y += direction.y * enemySpeed * delta;
+
+			//damage
+			if (enemyI.overlaps(player) && (time - lastDamageTime > 500)) {
+				playerHealth--;
+				System.out.println(playerHealth);
+				lastDamageTime = time;
+			}
 		}
 
 	}

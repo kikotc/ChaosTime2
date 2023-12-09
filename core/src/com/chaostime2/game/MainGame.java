@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 
 public class MainGame extends ApplicationAdapter {
@@ -24,14 +24,14 @@ public class MainGame extends ApplicationAdapter {
 
 	//player variables
 	private Texture playerImg;
-	private Rectangle player;
+	private Circle player;
 	private float playerVelocityX = 0;
 	private float playerVelocityY = 0;
 	private int playerVelocity = 100;
 
 	//enemy variables
 	private Texture enemyImg;
-	private Array<Rectangle> enemies;
+	private Array<Circle> enemies;
 	private long lastEnemyTime;
 
 	@Override
@@ -42,14 +42,13 @@ public class MainGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
 		playerImg = new Texture("player.png");
-		player = new Rectangle();
-		player.width = 80;
-		player.height = 80;
-		player.x = 960 - (player.width / 2);
-		player.y = 540 - (player.height / 2);
+		player = new Circle();
+		player.radius = 40;
+		player.x = 960 - player.radius;
+		player.y = 540 - player.radius;
 
 		enemyImg = new Texture("enemy.png");
-		enemies = new Array<Rectangle>();
+		enemies = new Array<Circle>();
 		spawnEnemy();
 	}
 
@@ -61,7 +60,7 @@ public class MainGame extends ApplicationAdapter {
 		camera.update();
 		batch.begin();
 		batch.draw(playerImg, player.x, player.y);
-		for(Rectangle enemy: enemies) {
+		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
 		batch.end();
@@ -69,7 +68,6 @@ public class MainGame extends ApplicationAdapter {
 		float delta = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
-		System.out.println(time);
 
 		//player
 		{
@@ -94,9 +92,9 @@ public class MainGame extends ApplicationAdapter {
 
 			//map border
 			if (player.x < 0) player.x = 0;
-			if (player.x > 1920 - player.width) player.x = 1920 - player.width;
+			if (player.x > 1920 - player.radius * 2) player.x = 1920 - player.radius * 2;
 			if (player.y < 0) player.y = 0;
-			if (player.y > 1080 - player.height) player.y = 1080 - player.height;
+			if (player.y > 1080 - player.radius * 2) player.y = 1080 - player.radius * 2;
 
 
 			//moving the player (position = velocity * time)
@@ -122,16 +120,15 @@ public class MainGame extends ApplicationAdapter {
 			}
 		}
 
-		if(time - lastEnemyTime > 2000000000 - TimeUtils.timeSinceMillis(startTime) / 100) spawnEnemy();
+		if(time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
 
 	}
 
 	private void spawnEnemy() {
-		Rectangle enemy = new Rectangle();
-		enemy.width = 60;
-		enemy.height = 60;
-		enemy.x = MathUtils.random(0, (1980 - enemy.width));
-		enemy.y = MathUtils.random(0, (1080 - enemy.height));
+		Circle enemy = new Circle();
+		enemy.radius = 30;
+		enemy.x = MathUtils.random(0, (1980 - enemy.radius * 2));
+		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
 		enemies.add(enemy);
 		lastEnemyTime = time;
 	}

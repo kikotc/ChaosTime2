@@ -33,7 +33,6 @@ public class MainGame extends ApplicationAdapter {
 	private int playerSpeed = 140;
 
 	private int playerHealth = 200;
-	
 
 	private Texture teleportImg;
 	private Circle teleport;
@@ -97,7 +96,6 @@ public class MainGame extends ApplicationAdapter {
 					teleport.y = player.y;
 				}
 				teleportPlaced = !teleportPlaced;
-				System.out.println(teleportPlaced);
 			}
 			if (Gdx.input.isKeyPressed(Keys.D)) {
 				playerDirection.x += 1;

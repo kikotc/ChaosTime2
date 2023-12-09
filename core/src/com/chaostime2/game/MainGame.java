@@ -18,7 +18,9 @@ public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Viewport viewport;
-	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime());
+	//subtract 1 so variable time will never be 0 (edge case)
+	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
+	private long time = 0;
 
 	//player variables
 	private Texture playerImg;
@@ -65,9 +67,9 @@ public class MainGame extends ApplicationAdapter {
 		batch.end();
 
 		float delta = Gdx.graphics.getDeltaTime();
-		long time = TimeUtils.nanosToMillis(TimeUtils.nanoTime());
+		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
-		System.out.println(time - startTime);
+		System.out.println(time);
 
 		//player
 		{
@@ -131,7 +133,7 @@ public class MainGame extends ApplicationAdapter {
 		enemy.x = MathUtils.random(0, (1980 - enemy.width));
 		enemy.y = MathUtils.random(0, (1080 - enemy.height));
 		enemies.add(enemy);
-		lastEnemyTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime());
+		lastEnemyTime = time;
 	}
 
 	public void resize(int width, int height) {

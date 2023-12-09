@@ -13,6 +13,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+
+import java.util.Iterator;
 
 public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -27,12 +30,16 @@ public class MainGame extends ApplicationAdapter {
 	private Circle player;
 	private float playerVelocityX = 0;
 	private float playerVelocityY = 0;
-	private int playerVelocity = 100;
+	private int playerVelocity = 90;
+	private Texture teleportImg;
+	private Circle teleport;
+	boolean teleportPlaced = false;
 
 	//enemy variables
 	private Texture enemyImg;
 	private Array<Circle> enemies;
 	private long lastEnemyTime;
+	private int enemyVelocity = 120;
 
 	@Override
 	public void create () {
@@ -46,6 +53,9 @@ public class MainGame extends ApplicationAdapter {
 		player.radius = 40;
 		player.x = 960 - player.radius;
 		player.y = 540 - player.radius;
+		teleportImg = new Texture("teleport.png");
+		teleport = new Circle();
+		teleport.radius = player.radius;
 
 		enemyImg = new Texture("enemy.png");
 		enemies = new Array<Circle>();
@@ -59,6 +69,7 @@ public class MainGame extends ApplicationAdapter {
 		//draws the player
 		camera.update();
 		batch.begin();
+		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
@@ -69,9 +80,20 @@ public class MainGame extends ApplicationAdapter {
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
 
-		//player
+		//player behavior
 		{
 			//controls
+			if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+				if (teleportPlaced) {
+					player.x = teleport.x;
+					player.y = teleport.y;
+				} else {
+					teleport.x = player.x;
+					teleport.y = player.y;
+				}
+				teleportPlaced = !teleportPlaced;
+				System.out.println(teleportPlaced);
+			}
 			if (Gdx.input.isKeyPressed(Keys.D)) {
 				playerVelocityX = playerVelocity;
 				movingX = true;
@@ -89,13 +111,11 @@ public class MainGame extends ApplicationAdapter {
 				movingY = true;
 			}
 
-
 			//map border
 			if (player.x < 0) player.x = 0;
 			if (player.x > 1920 - player.radius * 2) player.x = 1920 - player.radius * 2;
 			if (player.y < 0) player.y = 0;
 			if (player.y > 1080 - player.radius * 2) player.y = 1080 - player.radius * 2;
-
 
 			//moving the player (position = velocity * time)
 			player.x += playerVelocityX * delta;
@@ -120,7 +140,17 @@ public class MainGame extends ApplicationAdapter {
 			}
 		}
 
+		//enemy
 		if(time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
+		for (Iterator<Circle> iter = enemies.iterator();iter.hasNext();) {
+			Circle enemyI = iter.next();
+			Vector2 direction = new Vector2();
+			direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
+			direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
+			direction.nor();
+			enemyI.x += direction.x * enemyVelocity * delta;
+			enemyI.y += direction.y * enemyVelocity * delta;
+		}
 
 	}
 
@@ -141,5 +171,6 @@ public class MainGame extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		playerImg.dispose();
+		enemyImg.dispose();
 	}
 }

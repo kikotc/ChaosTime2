@@ -76,6 +76,7 @@ public class MainGame extends ApplicationAdapter {
 		}
 		batch.end();
 
+		Vector2 playerDirection = new Vector2(0,0);
 		float delta = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
@@ -95,31 +96,26 @@ public class MainGame extends ApplicationAdapter {
 				System.out.println(teleportPlaced);
 			}
 			if (Gdx.input.isKeyPressed(Keys.D)) {
-				playerVelocityX = playerVelocity;
+				playerDirection.x += 1;
 				movingX = true;
 			}
 			if (Gdx.input.isKeyPressed(Keys.A)) {
-				playerVelocityX = -playerVelocity;
+				playerDirection.x -= 1;
 				movingX = true;
 			}
 			if (Gdx.input.isKeyPressed(Keys.W)) {
-				playerVelocityY = playerVelocity;
+				playerDirection.y += 1;
 				movingY = true;
 			}
 			if (Gdx.input.isKeyPressed(Keys.S)) {
-				playerVelocityY = -playerVelocity;
+				playerDirection.y -= 1;
 				movingY = true;
 			}
 
-			//map border
-			if (player.x < 0) player.x = 0;
-			if (player.x > 1920 - player.radius * 2) player.x = 1920 - player.radius * 2;
-			if (player.y < 0) player.y = 0;
-			if (player.y > 1080 - player.radius * 2) player.y = 1080 - player.radius * 2;
-
-			//moving the player (position = velocity * time)
-			player.x += playerVelocityX * delta;
-			player.y += playerVelocityY * delta;
+			//moving the player (position = velocity * percent in direction * time)
+			playerDirection.nor();
+			player.x += playerVelocity * playerDirection.x * delta;
+			player.y += playerVelocity * playerDirection.y * delta;
 
 			//returns the velocity to zero slowly if no inputs
 			if (playerVelocityX > 0 && !movingX) {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -52,6 +53,10 @@ public class MainGame extends ApplicationAdapter {
 	private int enemySpeed = 160;
 	private int enemyDamage = 0;
 
+	//utilities
+	private BitmapFont font;
+	private int Timer=60;
+
 	@Override
 	public void create () {
 		camera = new OrthographicCamera();
@@ -64,7 +69,6 @@ public class MainGame extends ApplicationAdapter {
 		player.radius = 40;
 		player.x = 960 - player.radius;
 		player.y = 540 - player.radius;
-
 
 		healthBackgroundImg = new Texture("healthBackground.png");
 		healthImg = new Texture("health.png");
@@ -86,11 +90,15 @@ public class MainGame extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
+
+
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
+		font = new BitmapFont();
+		font.draw(batch, Integer.toString(Timer), 1800, 1000);
 		batch.draw(healthBackgroundImg, 20, 1000);
 		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
 		batch.draw(healthFrameImg, 20, 1000);
@@ -98,6 +106,7 @@ public class MainGame extends ApplicationAdapter {
 
 		float delta = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
+
 		boolean movingX = false, movingY = false;
 
 		//player behavior
@@ -180,7 +189,6 @@ public class MainGame extends ApplicationAdapter {
 			float y = player.y;
 
 			//damage
-
 				if (enemyI.overlaps(player)&&(time - lastDamageTime > 250)) {
 					for (int i = 0; i < enemies.size; i++) {
 						if(enemies.get(i).overlaps(player)){
@@ -202,7 +210,11 @@ public class MainGame extends ApplicationAdapter {
 		}
 
 	}
-
+	//WIP OF TIMER 
+	public void timeTrack(){
+		Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
+		System.out.println(Timer);
+	}
 	private void spawnEnemy() {
 		Circle enemy = new Circle();
 		enemy.radius = 30;
@@ -221,5 +233,6 @@ public class MainGame extends ApplicationAdapter {
 		batch.dispose();
 		playerImg.dispose();
 		enemyImg.dispose();
+		font.dispose();
 	}
 }

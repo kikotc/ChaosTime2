@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -30,10 +31,16 @@ public class MainGame extends ApplicationAdapter {
 	private Circle player;
 	private Vector2 playerDirection = new Vector2();
 	private Vector2 playerVelocity = new Vector2();
-	private int playerSpeed = 140;
+	private int playerSpeed = 180;
 
+	//health variables
 	private int playerHealth = 200;
+	private Texture healthBackgroundImg;
+	private Rectangle healthBackground;
+	private Texture healthFrameImg;
+	private Rectangle healthFrame;
 
+	//teleport abilities variables
 	private Texture teleportImg;
 	private Circle teleport;
 	boolean teleportPlaced = false;
@@ -43,7 +50,7 @@ public class MainGame extends ApplicationAdapter {
 	private Array<Circle> enemies;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
-	private int enemySpeed = 120;
+	private int enemySpeed = 160;
 
 	@Override
 	public void create () {
@@ -57,9 +64,12 @@ public class MainGame extends ApplicationAdapter {
 		player.radius = 40;
 		player.x = 960 - player.radius;
 		player.y = 540 - player.radius;
+
+		healthBackgroundImg = new Texture("healthBackground.png");
+		healthFrameImg = new Texture("healthFrame.png");
+
 		teleportImg = new Texture("teleport.png");
 		teleport = new Circle();
-		teleport.radius = player.radius;
 
 		enemyImg = new Texture("enemy.png");
 		enemies = new Array<Circle>();
@@ -68,16 +78,19 @@ public class MainGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(255, 255, 255, 1);
+		ScreenUtils.clear(0.422f, 0.326f, 0.252f, 1);
 
-		//draws the player
 		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+
 		batch.begin();
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
+		batch.draw(healthBackgroundImg, 20, 1000);
+		batch.draw(healthFrameImg, 20, 1000);
 		batch.end();
 
 		float delta = Gdx.graphics.getDeltaTime();
@@ -140,6 +153,11 @@ public class MainGame extends ApplicationAdapter {
 				playerVelocity.y += 300 * delta;
 				if (playerVelocity.y > 0) playerVelocity.y = 0;
 			}
+
+			if (player.x < 0) player.x = 0;
+			if (player.x > 1920 - player.radius * 2) player.x = 1920 - player.radius * 2;
+			if (player.y < 0) player.y = 0;
+			if (player.y > 1080 - player.radius * 2) player.y = 1080 - player.radius * 2;
 		}
 
 		//enemy
@@ -175,7 +193,7 @@ public class MainGame extends ApplicationAdapter {
 	}
 
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+		viewport.update(width, height, true);
 	}
 
 	@Override

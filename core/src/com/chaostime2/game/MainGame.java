@@ -36,9 +36,8 @@ public class MainGame extends ApplicationAdapter {
 	//health variables
 	private int playerHealth = 200;
 	private Texture healthBackgroundImg;
-	private Rectangle healthBackground;
+	private Texture healthImg;
 	private Texture healthFrameImg;
-	private Rectangle healthFrame;
 
 	//teleport abilities variables
 	private Texture teleportImg;
@@ -66,6 +65,7 @@ public class MainGame extends ApplicationAdapter {
 		player.y = 540 - player.radius;
 
 		healthBackgroundImg = new Texture("healthBackground.png");
+		healthImg = new Texture("health.png");
 		healthFrameImg = new Texture("healthFrame.png");
 
 		teleportImg = new Texture("teleport.png");
@@ -90,6 +90,7 @@ public class MainGame extends ApplicationAdapter {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
 		batch.draw(healthBackgroundImg, 20, 1000);
+		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
 		batch.draw(healthFrameImg, 20, 1000);
 		batch.end();
 
@@ -174,7 +175,7 @@ public class MainGame extends ApplicationAdapter {
 			enemyI.y += direction.y * enemySpeed * delta;
 
 			//damage
-			if (enemyI.overlaps(player) && (time - lastDamageTime > 500)) {
+			if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
 				playerHealth--;
 				System.out.println(playerHealth);
 				lastDamageTime = time;

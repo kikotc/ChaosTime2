@@ -50,6 +50,7 @@ public class MainGame extends ApplicationAdapter {
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
 	private int enemySpeed = 160;
+	private int enemyDamage = 0;
 
 	@Override
 	public void create () {
@@ -63,6 +64,7 @@ public class MainGame extends ApplicationAdapter {
 		player.radius = 40;
 		player.x = 960 - player.radius;
 		player.y = 540 - player.radius;
+
 
 		healthBackgroundImg = new Texture("healthBackground.png");
 		healthImg = new Texture("health.png");
@@ -174,12 +176,29 @@ public class MainGame extends ApplicationAdapter {
 			enemyI.x += direction.x * enemySpeed * delta;
 			enemyI.y += direction.y * enemySpeed * delta;
 
+			float x = player.x;
+			float y = player.y;
+
 			//damage
-			if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
-				playerHealth--;
-				System.out.println(playerHealth);
-				lastDamageTime = time;
-			}
+
+				if (enemyI.overlaps(player)&&(time - lastDamageTime > 250)) {
+					for (int i = 0; i < enemies.size; i++) {
+						if(enemies.get(i).overlaps(player)){
+							enemyDamage++;
+						}
+					}
+					System.out.println(enemyDamage);
+					lastDamageTime = time;
+					if(enemyDamage>0){
+						playerHealth-=enemyDamage;
+						enemyDamage=0;
+						System.out.println(playerHealth);
+						enemyDamage=0;
+					}
+				}
+
+
+
 		}
 
 	}

@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MainGame extends ApplicationAdapter {
@@ -53,6 +54,10 @@ public class MainGame extends ApplicationAdapter {
 	private int enemySpeed = 160;
 	private int enemyDamage = 0;
 
+	//bullet variable
+	ArrayList<Bullet> bullets;
+
+
 	//utilities
 	private BitmapFont font;
 	private int Timer=60;
@@ -84,6 +89,7 @@ public class MainGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		bullets = new ArrayList<Bullet>();
 		ScreenUtils.clear(0.422f, 0.326f, 0.252f, 1);
 
 		camera.update();
@@ -102,13 +108,29 @@ public class MainGame extends ApplicationAdapter {
 		batch.draw(healthBackgroundImg, 20, 1000);
 		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
 		batch.draw(healthFrameImg, 20, 1000);
+		for(Bullet bullets: bullets){
+			bullets.render(batch);
+		}
 		batch.end();
 
 		float delta = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 
 		boolean movingX = false, movingY = false;
+		//shooting
+		if(Gdx.input.isKeyPressed(Keys.F)){
+			bullets.add(new Bullet(player.x +4, player.y +4));
 
+		}
+		//update bullets
+		ArrayList<Bullet> removeBullets= new ArrayList<Bullet>();
+		for(Bullet bullet: bullets){
+			bullet.update(delta);
+			if(bullet.remove){
+				removeBullets.add(bullet);
+			}
+			bullets.removeAll(removeBullets);
+		}
 		//player behavior
 		{
 			//controls

@@ -1,6 +1,8 @@
 package com.chaostime2.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Bullet {
     public static final int Speed = 100;
@@ -15,5 +17,19 @@ public class Bullet {
         if(texture==null){
             texture = new Texture("bullet.png");
         }
+
+    }
+    public void update (float deltaTime){
+        y+=Speed * deltaTime;
+        if(y> 1080 || y<0){
+            remove =true;
+        }
+        if(x>1920|| x <0){
+            remove= true;
+        }
+
+    }
+    public void render(SpriteBatch batch){
+        batch.draw(texture,x,y);
     }
 }

@@ -184,9 +184,7 @@ public class MainGame extends ApplicationAdapter {
 			direction.nor();
 			enemyI.x += direction.x * enemySpeed * delta;
 			enemyI.y += direction.y * enemySpeed * delta;
-
-			float x = player.x;
-			float y = player.y;
+			
 
 			//damage
 				if (enemyI.overlaps(player)&&(time - lastDamageTime > 250)) {
@@ -210,7 +208,7 @@ public class MainGame extends ApplicationAdapter {
 		}
 
 	}
-	//WIP OF TIMER 
+	//WIP OF TIMER
 	public void timeTrack(){
 		Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
 		System.out.println(Timer);

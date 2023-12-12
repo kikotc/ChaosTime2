@@ -184,7 +184,7 @@ public class MainGame extends ApplicationAdapter {
 			direction.nor();
 			enemyI.x += direction.x * enemySpeed * delta;
 			enemyI.y += direction.y * enemySpeed * delta;
-			
+
 
 			//damage
 				if (enemyI.overlaps(player)&&(time - lastDamageTime > 250)) {
@@ -234,3 +234,5 @@ public class MainGame extends ApplicationAdapter {
 		font.dispose();
 	}
 }
+
+

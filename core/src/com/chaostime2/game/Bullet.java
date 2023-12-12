@@ -20,11 +20,13 @@ public class Bullet {
 
     }
     public void update (float deltaTime){
-        y+=Speed * deltaTime;
+        x+=Speed * deltaTime;
+
         if(y> 1080 || y<0){
             remove =true;
         }
-        if(x>1920|| x <0){
+
+        if(x>1920 || x <0){
             remove= true;
         }
 

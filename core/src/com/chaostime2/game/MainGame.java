@@ -61,6 +61,7 @@ public class MainGame extends ApplicationAdapter {
 	//utilities
 	private BitmapFont font;
 	private int Timer=60;
+	private int shootTime =0;
 
 	@Override
 	public void create () {
@@ -85,11 +86,13 @@ public class MainGame extends ApplicationAdapter {
 		enemyImg = new Texture("enemy.png");
 		enemies = new Array<Circle>();
 		spawnEnemy();
+
+		bullets = new ArrayList<Bullet>();
 	}
 
 	@Override
 	public void render () {
-		bullets = new ArrayList<Bullet>();
+
 		ScreenUtils.clear(0.422f, 0.326f, 0.252f, 1);
 
 		camera.update();
@@ -118,16 +121,18 @@ public class MainGame extends ApplicationAdapter {
 
 		boolean movingX = false, movingY = false;
 		//shooting
-		if(Gdx.input.isKeyPressed(Keys.F)){
+		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
 			bullets.add(new Bullet(player.x +4, player.y +4));
-
+			shootTime = (int)time;
 		}
 		//update bullets
 		ArrayList<Bullet> removeBullets= new ArrayList<Bullet>();
 		for(Bullet bullet: bullets){
 			bullet.update(delta);
 			if(bullet.remove){
-				removeBullets.add(bullet);
+				//this is what breaks it goes out of bounds im pretty sure 
+				//removeBullets.add(bullet);
+
 			}
 			bullets.removeAll(removeBullets);
 		}

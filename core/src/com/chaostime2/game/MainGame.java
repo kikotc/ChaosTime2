@@ -203,8 +203,6 @@ public class MainGame extends ApplicationAdapter {
 					}
 				}
 
-
-
 		}
 
 	}
@@ -231,6 +229,10 @@ public class MainGame extends ApplicationAdapter {
 		batch.dispose();
 		playerImg.dispose();
 		enemyImg.dispose();
+		healthBackgroundImg.dispose();
+		healthImg.dispose();
+		healthFrameImg.dispose();
+		teleportImg.dispose();
 		font.dispose();
 	}
 }

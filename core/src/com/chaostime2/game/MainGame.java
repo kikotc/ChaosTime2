@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.RecursiveAction;
 
 public class MainGame extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -58,6 +59,7 @@ public class MainGame extends ApplicationAdapter {
 	ArrayList<Bullet> bullets;
 
 
+
 	//utilities
 	private BitmapFont font;
 	private int Timer=60;
@@ -88,6 +90,7 @@ public class MainGame extends ApplicationAdapter {
 		spawnEnemy();
 
 		bullets = new ArrayList<Bullet>();
+		 = new
 	}
 
 	@Override
@@ -130,7 +133,7 @@ public class MainGame extends ApplicationAdapter {
 		for(Bullet bullet: bullets){
 			bullet.update(delta);
 			if(bullet.remove){
-				//this is what breaks it goes out of bounds im pretty sure 
+				//this is what breaks it goes out of bounds im pretty sure
 				//removeBullets.add(bullet);
 
 			}

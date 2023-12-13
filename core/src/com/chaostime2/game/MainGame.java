@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -27,6 +28,8 @@ public class MainGame implements Screen {
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Viewport viewport;
+	private Viewport extendViewport;
+	private Texture backgroundImg;
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
 	private long time = 0;
@@ -60,7 +63,6 @@ public class MainGame implements Screen {
 	//bullet variable
 	ArrayList<Bullet> bullets;
 
-
 	//utilities
 	private BitmapFont font;
 	private int Timer=60;
@@ -71,7 +73,9 @@ public class MainGame implements Screen {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1920, 1080);
 		viewport = new FitViewport(1920, 1080, camera);
+		extendViewport = new ExtendViewport(1920, 1080, camera);
 		batch = new SpriteBatch();
+		backgroundImg = new Texture("background.png");
 
 		playerImg = new Texture("player.png");
 		player = new Circle();
@@ -101,6 +105,7 @@ public class MainGame implements Screen {
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
+		batch.draw(backgroundImg, -100, -100);
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
@@ -215,6 +220,10 @@ public class MainGame implements Screen {
 			direction.nor();
 			enemyI.x += direction.x * enemySpeed * deltaTime;
 			enemyI.y += direction.y * enemySpeed * deltaTime;
+			if (enemyI.x < 0) enemyI.x = 0;
+			if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
+			if (enemyI.y < 0) enemyI.y = 0;
+			if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
 
 			//damage
 			if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
@@ -251,6 +260,7 @@ public class MainGame implements Screen {
 
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
+		extendViewport.update(width, height);
 	}
 
 	@Override

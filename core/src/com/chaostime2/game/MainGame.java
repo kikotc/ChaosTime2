@@ -3,6 +3,7 @@ package com.chaostime2.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.RecursiveAction;
 
-public class MainGame extends ApplicationAdapter {
+public class MainGame implements Screen {
+	final ChaosTime game;
+
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Viewport viewport;
@@ -65,8 +68,8 @@ public class MainGame extends ApplicationAdapter {
 	private int Timer=60;
 	private int shootTime =0;
 
-	@Override
-	public void create () {
+	public MainGame(final ChaosTime game) {
+		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1920, 1080);
 		viewport = new FitViewport(1920, 1080, camera);
@@ -94,16 +97,13 @@ public class MainGame extends ApplicationAdapter {
 	}
 
 	@Override
-	public void render () {
-
+	public void render(float delta) {
 		ScreenUtils.clear(0.422f, 0.326f, 0.252f, 1);
 
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
-
-
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
@@ -119,19 +119,23 @@ public class MainGame extends ApplicationAdapter {
 		}
 		batch.end();
 
-		float delta = Gdx.graphics.getDeltaTime();
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
+
+		float deltaTime = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 
 		boolean movingX = false, movingY = false;
 		//shooting
 		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
-			bullets.add(new Bullet(player.x +4, player.y +4));
+			bullets.add(new Bullet(player.x + 4, player.y + 4));
 			shootTime = (int)time;
 		}
 		//update bullets
 		ArrayList<Bullet> removeBullets= new ArrayList<Bullet>();
 		for(Bullet bullet: bullets){
-			bullet.update(delta);
+			bullet.update(deltaTime);
 			if(bullet.remove){
 				//this is what breaks it goes out of bounds im pretty sure
 				//removeBullets.add(bullet);
@@ -175,24 +179,24 @@ public class MainGame extends ApplicationAdapter {
 				playerVelocity.x = playerSpeed * playerDirection.x;
 				playerVelocity.y = playerSpeed * playerDirection.y;
 			}
-			player.x += playerVelocity.x * delta;
-			player.y += playerVelocity.y * delta;
+			player.x += playerVelocity.x * deltaTime;
+			player.y += playerVelocity.y * deltaTime;
 
 			//dampen player movement
 			if (playerVelocity.x > 0 && !movingX) {
-				playerVelocity.x -= 300 * delta;
+				playerVelocity.x -= 300 * deltaTime;
 				if (playerVelocity.x < 0) playerVelocity.x = 0;
 			}
 			if (playerVelocity.x < 0 && !movingX) {
-				playerVelocity.x += 300 * delta;
+				playerVelocity.x += 300 * deltaTime;
 				if (playerVelocity.x > 0) playerVelocity.x = 0;
 			}
 			if (playerVelocity.y > 0 && !movingY) {
-				playerVelocity.y -= 300 * delta;
+				playerVelocity.y -= 300 * deltaTime;
 				if (playerVelocity.y < 0) playerVelocity.y = 0;
 			}
 			if (playerVelocity.y < 0 && !movingY) {
-				playerVelocity.y += 300 * delta;
+				playerVelocity.y += 300 * deltaTime;
 				if (playerVelocity.y > 0) playerVelocity.y = 0;
 			}
 
@@ -212,27 +216,25 @@ public class MainGame extends ApplicationAdapter {
 			direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
 			direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
 			direction.nor();
-			enemyI.x += direction.x * enemySpeed * delta;
-			enemyI.y += direction.y * enemySpeed * delta;
-
+			enemyI.x += direction.x * enemySpeed * deltaTime;
+			enemyI.y += direction.y * enemySpeed * deltaTime;
 
 			//damage
-				if (enemyI.overlaps(player)&&(time - lastDamageTime > 250)) {
-					for (int i = 0; i < enemies.size; i++) {
-						if(enemies.get(i).overlaps(player)){
-							enemyDamage++;
-						}
-					}
-					System.out.println(enemyDamage);
-					lastDamageTime = time;
-					if(enemyDamage>0){
-						playerHealth-=enemyDamage;
-						enemyDamage=0;
-						System.out.println(playerHealth);
-						enemyDamage=0;
+			if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
+				for (int i = 0; i < enemies.size; i++) {
+					if(enemies.get(i).overlaps(player)){
+						enemyDamage++;
 					}
 				}
-
+				System.out.println(enemyDamage);
+				lastDamageTime = time;
+				if(enemyDamage>0){
+					playerHealth-=enemyDamage;
+					enemyDamage=0;
+					System.out.println(playerHealth);
+					enemyDamage=0;
+				}
+			}
 		}
 
 	}
@@ -252,6 +254,22 @@ public class MainGame extends ApplicationAdapter {
 
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
+	}
+
+	@Override
+	public void show() {
+	}
+
+	@Override
+	public void hide() {
+	}
+
+	@Override
+	public void pause() {
+	}
+
+	@Override
+	public void resume() {
 	}
 
 	@Override

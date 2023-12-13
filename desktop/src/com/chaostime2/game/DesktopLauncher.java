@@ -14,9 +14,10 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("Chaos Time");
 		//config.setFullscreenMode(primaryDesktopMode);
-		config.setWindowedMode(1920,1080);
+		//config.setWindowedMode(1920,1080);
+		config.setWindowedMode(600,400);
 		config.useVsync(true);
 		config.setForegroundFPS(60);
-		new Lwjgl3Application(new MainGame(), config);
+		new Lwjgl3Application(new ChaosTime(), config);
 	}
 }

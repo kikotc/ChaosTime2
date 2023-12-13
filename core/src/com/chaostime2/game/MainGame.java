@@ -116,6 +116,10 @@ public class MainGame implements Screen {
 		}
 		batch.end();
 
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 

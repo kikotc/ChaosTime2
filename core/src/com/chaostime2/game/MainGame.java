@@ -3,11 +3,14 @@ package com.chaostime2.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -20,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.RecursiveAction;
 
-public class MainGame implements Screen {
+public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
 
 	private SpriteBatch batch;
@@ -28,6 +31,7 @@ public class MainGame implements Screen {
 	private Viewport viewport;
 	private Viewport extendViewport;
 	private Texture backgroundImg;
+	private Vector3 mouseVector = new Vector3();
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
 	private long time = 0;
@@ -68,6 +72,8 @@ public class MainGame implements Screen {
 	private int shootTime =0;
 
 	public MainGame(final ChaosTime game) {
+		Gdx.input.setInputProcessor(this);
+
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1920, 1080);
@@ -119,6 +125,8 @@ public class MainGame implements Screen {
 			bullets.render(batch);
 		}
 		batch.end();
+
+		System.out.println(mouseVector);
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
@@ -238,7 +246,6 @@ public class MainGame implements Screen {
 					enemyDamage=0;
 					System.out.println(playerHealth);
 					enemyDamage=0;
-					System.out.println(mouseVector);
 				}
 			}
 		}
@@ -257,33 +264,16 @@ public class MainGame implements Screen {
 		enemies.add(enemy);
 		lastEnemyTime = time;
 	}
-	//mouse tracking
 
-	Vector3 mouseVector = new Vector3();
+	@Override
 	public boolean mouseMoved (int screenX, int screenY) {
-		// we can also handle mouse movement without anything pressed
 		camera.unproject(mouseVector.set(screenX, screenY, 0));
 		return false;
 	}
+
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
 		extendViewport.update(width, height);
-	}
-
-	@Override
-	public void show() {
-	}
-
-	@Override
-	public void hide() {
-	}
-
-	@Override
-	public void pause() {
-	}
-
-	@Override
-	public void resume() {
 	}
 
 	@Override
@@ -296,6 +286,51 @@ public class MainGame implements Screen {
 		healthFrameImg.dispose();
 		teleportImg.dispose();
 		font.dispose();
+	}
+
+	@Override
+	public void show() {
+	}
+	@Override
+	public void hide() {
+	}
+	@Override
+	public void pause() {
+	}
+	@Override
+	public void resume() {
+	}
+	@Override
+	public boolean keyDown(int i) {
+		return false;
+	}
+	@Override
+	public boolean keyUp(int i) {
+		return false;
+	}
+	@Override
+	public boolean keyTyped(char c) {
+		return false;
+	}
+	@Override
+	public boolean touchDown(int i, int i1, int i2, int i3) {
+		return false;
+	}
+	@Override
+	public boolean touchUp(int i, int i1, int i2, int i3) {
+		return false;
+	}
+	@Override
+	public boolean touchCancelled(int i, int i1, int i2, int i3) {
+		return false;
+	}
+	@Override
+	public boolean touchDragged(int i, int i1, int i2) {
+		return false;
+	}
+	@Override
+	public boolean scrolled(float v, float v1) {
+		return false;
 	}
 }
 

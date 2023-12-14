@@ -8,16 +8,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +38,7 @@ public class MainGame implements Screen {
 	private Vector2 playerDirection = new Vector2();
 	private Vector2 playerVelocity = new Vector2();
 	private int playerSpeed = 180;
+
 
 	//health variables
 	private int playerHealth = 200;
@@ -240,6 +238,7 @@ public class MainGame implements Screen {
 					enemyDamage=0;
 					System.out.println(playerHealth);
 					enemyDamage=0;
+					System.out.println(mouseVector);
 				}
 			}
 		}
@@ -258,7 +257,14 @@ public class MainGame implements Screen {
 		enemies.add(enemy);
 		lastEnemyTime = time;
 	}
+	//mouse tracking
 
+	Vector3 mouseVector = new Vector3();
+	public boolean mouseMoved (int screenX, int screenY) {
+		// we can also handle mouse movement without anything pressed
+		camera.unproject(mouseVector.set(screenX, screenY, 0));
+		return false;
+	}
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
 		extendViewport.update(width, height);

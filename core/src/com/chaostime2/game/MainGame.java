@@ -141,7 +141,7 @@ public class MainGame implements Screen {
 			bullet.update(deltaTime);
 			if(bullet.remove){
 				//this is what breaks it goes out of bounds im pretty sure 
-				//removeBullets.add(bullet);
+				removeBullets.add(bullet);
 
 			}
 			bullets.removeAll(removeBullets);

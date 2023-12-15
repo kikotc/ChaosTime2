@@ -68,8 +68,8 @@ public class MainGame implements Screen, InputProcessor {
 
 	//utilities
 	private BitmapFont font;
-	private int Timer=60;
-	private int shootTime =0;
+	private int Timer = 60;
+	private int shootTime = 0;
 
 	public MainGame(final ChaosTime game) {
 		Gdx.input.setInputProcessor(this);

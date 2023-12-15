@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -30,6 +29,7 @@ public class MainGame implements Screen, InputProcessor {
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	private Viewport extendViewport;
+	private Texture foregroundImg;
 	private Texture backgroundImg;
 	private Vector3 mouseVector = new Vector3();
 	//subtract 1 so variable time will never be 0 (edge case)
@@ -80,6 +80,8 @@ public class MainGame implements Screen, InputProcessor {
 		viewport = new FitViewport(1920, 1080, camera);
 		extendViewport = new ExtendViewport(1920, 1080, camera);
 		batch = new SpriteBatch();
+		font = new BitmapFont();
+		foregroundImg = new Texture("foreground.png");
 		backgroundImg = new Texture("background.png");
 
 		playerImg = new Texture("player.png");
@@ -104,26 +106,26 @@ public class MainGame implements Screen, InputProcessor {
 
 	@Override
 	public void render(float delta) {
-		ScreenUtils.clear(0.422f, 0.326f, 0.252f, 1);
+		ScreenUtils.clear(0.639f, 0.647f, 0.659f, 1);
 
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
-		batch.draw(backgroundImg, -100, -100);
+		batch.draw(backgroundImg, -400, -400);
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
+		for(Bullet bullets: bullets){
+			bullets.render(batch);
+		}
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
-		font = new BitmapFont();
+		batch.draw(foregroundImg, -600, -600);
 		font.draw(batch, Integer.toString(Timer), 1800, 1000);
 		batch.draw(healthBackgroundImg, 20, 1000);
 		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
 		batch.draw(healthFrameImg, 20, 1000);
-		for(Bullet bullets: bullets){
-			bullets.render(batch);
-		}
 		batch.end();
 
 		System.out.println(mouseVector);
@@ -281,6 +283,7 @@ public class MainGame implements Screen, InputProcessor {
 		batch.dispose();
 		playerImg.dispose();
 		enemyImg.dispose();
+		foregroundImg.dispose();
 		healthBackgroundImg.dispose();
 		healthImg.dispose();
 		healthFrameImg.dispose();

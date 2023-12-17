@@ -48,22 +48,16 @@ public class MainMenu implements Screen {
     }
 
     @Override
-    public void show() {
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
     public void dispose() {
+        menuImg.dispose();
     }
+
+    @Override
+    public void show() {}
+    @Override
+    public void hide() {}
+    @Override
+    public void pause() {}
+    @Override
+    public void resume() {}
 }

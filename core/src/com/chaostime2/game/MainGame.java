@@ -114,8 +114,8 @@ public class MainGame implements Screen, InputProcessor {
 		batch.begin();
 		batch.draw(backgroundImg, -400, -400);
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
-		for(Bullet bullets: bullets){
-			bullets.render(batch);
+		for(Bullet bullet: bullets){
+			bullet.render(batch);
 		}
 		batch.draw(playerImg, player.x, player.y);
 		for(Circle enemy: enemies) {
@@ -133,16 +133,30 @@ public class MainGame implements Screen, InputProcessor {
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
 		}
+		if (playerHealth <= 0) {
+			Gdx.app.exit();
+		}
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 
 		boolean movingX = false, movingY = false;
+
 		//shooting
 		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
 			bullets.add(new Bullet(player.x + 4, player.y + 4));
 			shootTime = (int)time;
 		}
+
+		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+			Bullet bulletI = bulletIter.next();
+			bulletI.update(deltaTime);
+			if(bulletI.remove){
+				bulletIter.remove();
+			}
+		}
+
+		/*
 		//update bullets
 		ArrayList<Bullet> removeBullets= new ArrayList<Bullet>();
 		for(Bullet bullet: bullets){
@@ -153,7 +167,8 @@ public class MainGame implements Screen, InputProcessor {
 
 			}
 			bullets.removeAll(removeBullets);
-		}
+		}*/
+
 		//player behavior
 		{
 			//controls
@@ -253,11 +268,13 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 	}
+
 	//WIP OF TIMER
 	public void timeTrack(){
 		Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
 		System.out.println(Timer);
 	}
+
 	private void spawnEnemy() {
 		Circle enemy = new Circle();
 		enemy.radius = 30;
@@ -273,6 +290,7 @@ public class MainGame implements Screen, InputProcessor {
 		return false;
 	}
 
+	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
 		extendViewport.update(width, height);
@@ -292,17 +310,13 @@ public class MainGame implements Screen, InputProcessor {
 	}
 
 	@Override
-	public void show() {
-	}
+	public void show() {}
 	@Override
-	public void hide() {
-	}
+	public void hide() {}
 	@Override
-	public void pause() {
-	}
+	public void pause() {}
 	@Override
-	public void resume() {
-	}
+	public void resume() {}
 	@Override
 	public boolean keyDown(int i) {
 		return false;

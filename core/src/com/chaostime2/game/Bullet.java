@@ -26,12 +26,12 @@ public class Bullet {
        x += BulletSpeed.x * 1 * deltaTime * 250;
        y += BulletSpeed.y * 1 * deltaTime;
 
-        if(y> 1080 || y<0){
-            remove =true;
+        if(y > 1080 || y<0){
+            remove = true;
         }
 
-        if(x>1920 || x <0){
-            remove= true;
+        if(x > 1920 || x <0){
+            remove = true;
         }
     }
     public void render(SpriteBatch batch){

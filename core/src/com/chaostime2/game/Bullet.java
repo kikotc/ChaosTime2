@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.sun.tools.javac.Main;
 
 public class Bullet {
     public static Vector2 BulletSpeed = new Vector2(100,100);
@@ -11,9 +13,18 @@ public class Bullet {
     private static Texture texture;
 
     float x, y;
+    float mouseX, mouseY;
+    int direction;
+
+
+
+
+
+
 
     public boolean remove = false;
     public Bullet(float x, float y){
+//        MainGame obj = new MainGame();
         this.x =x;
         this.y =y;
         if(texture==null){
@@ -21,10 +32,13 @@ public class Bullet {
         }
 
     }
+    public void Direction(){
+
+    }
     public void update (float deltaTime){
        BulletSpeed.nor();
-       x += BulletSpeed.x * 1 * deltaTime * 250;
-       y += BulletSpeed.y * 1 * deltaTime;
+       x += 250  * deltaTime * direction * mouseX ;
+       y += 250  * deltaTime * direction * mouseY ;
 
         if(y > 1080 || y<0){
             remove = true;
@@ -34,7 +48,15 @@ public class Bullet {
             remove = true;
         }
     }
+    public void mouse (int md, float mX,  float mY){
+        direction = md;
+        mouseX = mX;
+        mouseY = mY;
+
+
+    }
     public void render(SpriteBatch batch){
         batch.draw(texture,x,y);
     }
+
 }

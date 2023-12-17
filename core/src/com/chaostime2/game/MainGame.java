@@ -31,7 +31,7 @@ public class MainGame implements Screen, InputProcessor {
 	private Viewport extendViewport;
 	private Texture foregroundImg;
 	private Texture backgroundImg;
-	private Vector3 mouseVector = new Vector3();
+	public Vector3 mouseVector = new Vector3();
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
 	private long time = 0;
@@ -65,6 +65,8 @@ public class MainGame implements Screen, InputProcessor {
 
 	//bullet variable
 	ArrayList<Bullet> bullets;
+	public int direction;
+
 
 	//utilities
 	private BitmapFont font;
@@ -144,8 +146,25 @@ public class MainGame implements Screen, InputProcessor {
 
 		//shooting
 		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
-			bullets.add(new Bullet(player.x + 4, player.y + 4));
+
+			bullets.add(new Bullet(player.x, player.y ));
 			shootTime = (int)time;
+
+		}
+		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+			Bullet bulletI = bulletIter.next();
+			mouseVector.nor();
+			if(mouseVector.x > player.x){
+				direction = 1;
+			}
+			if(mouseVector.x < player.x){
+				direction = -1;
+			}
+			if(mouseVector.y >player.y)
+				direction = 1;
+			if(mouseVector.y < player.y)
+				direction = -1;
+			bulletI.mouse(direction, mouseVector.x, mouseVector.y);
 		}
 
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
@@ -155,19 +174,6 @@ public class MainGame implements Screen, InputProcessor {
 				bulletIter.remove();
 			}
 		}
-
-		/*
-		//update bullets
-		ArrayList<Bullet> removeBullets= new ArrayList<Bullet>();
-		for(Bullet bullet: bullets){
-			bullet.update(deltaTime);
-			if(bullet.remove){
-				//this is what breaks it goes out of bounds im pretty sure 
-				removeBullets.add(bullet);
-
-			}
-			bullets.removeAll(removeBullets);
-		}*/
 
 		//player behavior
 		{
@@ -268,6 +274,7 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 	}
+
 
 	//WIP OF TIMER
 	public void timeTrack(){

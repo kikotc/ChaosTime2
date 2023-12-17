@@ -8,18 +8,18 @@ import com.badlogic.gdx.math.Vector3;
 import com.sun.tools.javac.Main;
 
 public class Bullet {
-    public static Vector2 BulletSpeed = new Vector2(100,100);
+    public static Vector2 BulletDirection = new Vector2(100,100);
 
     private static Texture texture;
 
     float x, y;
     float mouseX, mouseY;
-    int direction;
-
-
-
-
-
+    float playerX, playerY;
+    float bulletPosX, bulletPosY;
+    Vector3 mPos;
+    float  pX;
+    float pY;
+    int directionX, directionY;
 
 
     public boolean remove = false;
@@ -32,13 +32,27 @@ public class Bullet {
         }
 
     }
-    public void Direction(){
-
+    public void Direction(float deltaTime){
+        if(mouseX > playerX){
+            BulletDirection.x += 1;
+        }
+        if(mouseX < playerX){
+            BulletDirection.x -= 1;
+        }
+        if(mouseY > playerY)
+            BulletDirection.y += 1;
+        if(mouseY < playerY)
+            BulletDirection.y -= 1;
+        //System.out.println(directionX);
     }
     public void update (float deltaTime){
-       BulletSpeed.nor();
-       x += 250  * deltaTime * direction * mouseX ;
-       y += 250  * deltaTime * direction * mouseY ;
+       BulletDirection.nor();
+       int dx = (int)(mouseX - playerX);
+       int dy = (int)(mouseY - playerY);
+
+       x += dx * deltaTime;
+
+       y += dy * deltaTime;
 
         if(y > 1080 || y<0){
             remove = true;
@@ -48,10 +62,16 @@ public class Bullet {
             remove = true;
         }
     }
-    public void mouse (int md, float mX,  float mY){
-        direction = md;
+    public void mouse ( float mX,  float mY, float px, float py){
+//        direction = md;
         mouseX = mX;
         mouseY = mY;
+        playerX = px;
+        playerY =py;
+
+
+
+
 
 
     }

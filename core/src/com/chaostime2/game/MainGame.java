@@ -153,20 +153,11 @@ public class MainGame implements Screen, InputProcessor {
 		}
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
-			mouseVector.nor();
-			if(mouseVector.x > player.x){
-				direction = 1;
-			}
-			if(mouseVector.x < player.x){
-				direction = -1;
-			}
-			if(mouseVector.y >player.y)
-				direction = 1;
-			if(mouseVector.y < player.y)
-				direction = -1;
-			bulletI.mouse(direction, mouseVector.x, mouseVector.y);
-		}
 
+			bulletI.mouse( mouseVector.x, mouseVector.y, player.x, player.y );
+			bulletI.Direction(deltaTime);
+		}
+		//delete out of bounds bullets
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update(deltaTime);

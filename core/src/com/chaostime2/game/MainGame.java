@@ -153,7 +153,7 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 		//shooting
-		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
+		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 400 ){
 			bullets.add(new Bullet(player.x, player.y, relativeMouse.x, relativeMouse.y));
 			shootTime = (int)time;
 		}
@@ -174,7 +174,11 @@ public class MainGame implements Screen, InputProcessor {
 				Circle enemyI = EnemyIter.next();
 				System.out.println(bulletI.getbX());
 				System.err.println(enemyI.x);
-				if ((bulletI.getbX()>=enemyI.x-25 && bulletI.getbX()<=enemyI.x+25) && (bulletI.getbY()<=enemyI.y +25 && bulletI.getbY()>=enemyI.y-25)){
+//				if ((bulletI.getbX()-enemyI.x>=-28 && bulletI.getbX()-enemyI.x<=28) &&
+//						(bulletI.getbY()-enemyI.y <=28 && bulletI.getbY()-enemyI.y>=-28))
+				if(Math.abs(bulletI.getbX()-enemyI.x)<= enemyI.radius&&
+						Math.abs(bulletI.getbY()-enemyI.y)<=enemyI.radius)
+				{
 					System.out.println("collide");
 					bulletIter.remove();
 					EnemyIter.remove();

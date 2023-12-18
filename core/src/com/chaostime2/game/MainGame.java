@@ -58,7 +58,7 @@ public class MainGame implements Screen, InputProcessor {
 	private Array<Enemy> enemies;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
-	private int enemySpeed = 240;
+
 	private int enemyDamage = 0;
 
 	//bullet variable
@@ -235,15 +235,21 @@ public class MainGame implements Screen, InputProcessor {
 
 		//enemy
 		{
-			if (time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
+			if (time - lastEnemyTime > 20000000 / time + 500){
+				//need to pass values through
+				Enemy enemy = new Enemy(1.1f, 1.1f);
+				enemies.add(enemy);
+				lastEnemyTime = time;
+			}
 			for (Enemy enemyI : enemies) {
+
                 //individual enemy movement
                 Vector2 direction = new Vector2();
 				direction.x = (player.x + player.radius) - (enemyI.hitbox.x + enemyI.hitbox.radius);
 				direction.y = (player.y + player.radius) - (enemyI.hitbox.y + enemyI.hitbox.radius);
                 direction.nor();
-				enemyI.hitbox.x += direction.x * enemySpeed * deltaTime;
-				enemyI.hitbox.y += direction.y * enemySpeed * deltaTime;
+
+
 				if (enemyI.hitbox.x < 0) enemyI.hitbox.x = 0;
 				if (enemyI.hitbox.x > 1920 - enemyI.hitbox.radius * 2) enemyI.hitbox.x = 1920 - enemyI.hitbox.radius * 2;
 				if (enemyI.hitbox.y < 0) {enemyI.hitbox.y = 0;}
@@ -276,9 +282,7 @@ public class MainGame implements Screen, InputProcessor {
 	}
 
 	private void spawnEnemy() {
-		Enemy enemy = new Enemy();
-		enemies.add(enemy);
-		lastEnemyTime = time;
+
 	}
 
 	@Override

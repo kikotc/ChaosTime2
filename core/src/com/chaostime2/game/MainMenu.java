@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -13,6 +14,7 @@ public class MainMenu implements Screen {
     final ChaosTime game;
     private OrthographicCamera camera;
     private Viewport viewport;
+    private Viewport extendViewport;
 
     private Texture menuImg;
 
@@ -21,6 +23,7 @@ public class MainMenu implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1920, 1080);
         viewport = new FitViewport(1920, 1080, camera);
+        extendViewport = new ExtendViewport(1920, 1080, camera);
 
         menuImg = new Texture("menu.png");
     }
@@ -45,6 +48,7 @@ public class MainMenu implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        extendViewport.update(width, height);
     }
 
     @Override

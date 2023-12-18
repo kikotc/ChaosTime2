@@ -1,6 +1,5 @@
 package com.chaostime2.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -20,7 +18,6 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.RecursiveAction;
 
 public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
@@ -43,8 +40,7 @@ public class MainGame implements Screen, InputProcessor {
 	private Circle player;
 	private Vector2 playerDirection = new Vector2();
 	private Vector2 playerVelocity = new Vector2();
-	private int playerSpeed = 180;
-
+	private int playerSpeed = 220;
 
 	//health variables
 	private int playerHealth = 200;
@@ -60,20 +56,14 @@ public class MainGame implements Screen, InputProcessor {
 	//enemy variables
 	private Texture enemyImg;
 	private Array<Circle> enemies;
-	private int HEIGHT = 30;
-	private int WIDTH = 30;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
-	private int enemySpeed = 160;
+	private int enemySpeed = 240;
 	private int enemyDamage = 0;
 
 	//bullet variable
 	ArrayList<Bullet> bullets;
-	public int direction;
 
-
-	//Collision
-	Collision rect;
 	//utilities
 	private BitmapFont font;
 	private int Timer = 60;
@@ -153,7 +143,7 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 		//shooting
-		if(Gdx.input.isTouched() && time - shootTime > 250 ){
+		if(Gdx.input.isTouched() && time - shootTime > 500){
 			bullets.add(new Bullet(player.x + player.radius, player.y + player.radius, relativeMouse.x, relativeMouse.y));
 			shootTime = (int)time;
 		}
@@ -290,7 +280,6 @@ public class MainGame implements Screen, InputProcessor {
 		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
 		enemies.add(enemy);
 		lastEnemyTime = time;
-		this.rect = new Collision( enemy.x, enemy.y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -311,6 +300,7 @@ public class MainGame implements Screen, InputProcessor {
 		playerImg.dispose();
 		enemyImg.dispose();
 		foregroundImg.dispose();
+		backgroundImg.dispose();
 		healthBackgroundImg.dispose();
 		healthImg.dispose();
 		healthFrameImg.dispose();

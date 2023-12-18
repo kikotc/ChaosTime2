@@ -32,6 +32,8 @@ public class Bullet {
     public void update () {
         position.x += direction.x * 250 * Gdx.graphics.getDeltaTime();
         position.y += direction.y * 250 * Gdx.graphics.getDeltaTime();
+        bX = position.x;
+        bY = position.y;
         if (position.x > 1920 || position.x < 0 || position.y > 1080 || position.y < 0) {
             remove = true;
             rect.move(x, y);

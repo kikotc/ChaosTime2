@@ -139,7 +139,6 @@ public class MainGame implements Screen, InputProcessor {
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
 
-		System.out.println(mouseVector);
 		relativeMouse.x = mouseVector.x - player.x;
 		relativeMouse.y = mouseVector.y - player.y;
 		relativeMouse.nor();
@@ -165,18 +164,20 @@ public class MainGame implements Screen, InputProcessor {
 				bulletIter.remove();
 			}
 		}
-		Bullet bulletInstance = new Bullet(12f,12f, 12f,12f);
-		float bPosX = bulletInstance.getbX();
-		float bPosY = bulletInstance.getbY();
+
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
 			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();){
 				Circle enemyI = EnemyIter.next();
-				if (bPosX== enemyI.x && bPosY == enemyI.y){
+				System.out.println(bulletI.getbX());
+				System.err.println(enemyI.x);
+				if (bulletI.getbX()== enemyI.x && bulletI.getbY()== enemyI.y){
+					System.out.println("collide");
 					bulletIter.remove();
 					EnemyIter.remove();
 				}
+
 			}
 
 		}

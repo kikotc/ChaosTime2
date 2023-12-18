@@ -8,45 +8,27 @@ import com.badlogic.gdx.math.Vector3;
 import com.sun.tools.javac.Main;
 
 public class Bullet {
-    public static Vector2 BulletDirection = new Vector2(100,100);
 
     private static Texture texture;
 
     float x, y;
     float mouseX, mouseY;
     float playerX, playerY;
-    float bulletPosX, bulletPosY;
-    Vector3 mPos;
-    float  pX;
-    float pY;
-    int directionX, directionY;
+
+
 
 
     public boolean remove = false;
-    public Bullet(float x, float y){
-//        MainGame obj = new MainGame();
-        this.x =x;
-        this.y =y;
+    public Bullet(float x, float y) {
+        this.x = x;
+        this.y = y;
         if(texture==null){
             texture = new Texture("bullet.png");
         }
 
     }
-    public void Direction(float deltaTime){
-        if(mouseX > playerX){
-            BulletDirection.x += 1;
-        }
-        if(mouseX < playerX){
-            BulletDirection.x -= 1;
-        }
-        if(mouseY > playerY)
-            BulletDirection.y += 1;
-        if(mouseY < playerY)
-            BulletDirection.y -= 1;
-        //System.out.println(directionX);
-    }
+
     public void update (float deltaTime){
-       BulletDirection.nor();
        int dx = (int)(mouseX - playerX);
        int dy = (int)(mouseY - playerY);
 
@@ -63,20 +45,16 @@ public class Bullet {
         }
     }
     public void mouse ( float mX,  float mY, float px, float py){
-//        direction = md;
         mouseX = mX;
         mouseY = mY;
         playerX = px;
         playerY =py;
-
-
-
-
-
-
     }
     public void render(SpriteBatch batch){
-        batch.draw(texture,x,y);
+
+        batch.draw(texture, x, y);
+        System.out.println(x + "and " + y);
+
     }
 
 }

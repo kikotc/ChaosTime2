@@ -25,7 +25,8 @@ import java.util.concurrent.RecursiveAction;
 public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
 
-	private SpriteBatch batch;
+	//private SpriteBatch batch;
+	public SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	private Viewport extendViewport;
@@ -75,7 +76,6 @@ public class MainGame implements Screen, InputProcessor {
 
 	public MainGame(final ChaosTime game) {
 		Gdx.input.setInputProcessor(this);
-
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1920, 1080);
@@ -123,6 +123,7 @@ public class MainGame implements Screen, InputProcessor {
 		for(Circle enemy: enemies) {
 			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
+
 		batch.draw(foregroundImg, -600, -600);
 		font.draw(batch, Integer.toString(Timer), 1800, 1000);
 		batch.draw(healthBackgroundImg, 20, 1000);
@@ -143,28 +144,30 @@ public class MainGame implements Screen, InputProcessor {
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 
 		boolean movingX = false, movingY = false;
-
 		//shooting
 		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
 
-			bullets.add(new Bullet(player.x, player.y ));
+			bullets.add(new Bullet(player.x, player.y));
+			for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+				Bullet bulletI = bulletIter.next();
+				bulletI.mouse(mouseVector.x, mouseVector.y, player.x, player.y);
+
+
+			}
 			shootTime = (int)time;
-
 		}
-		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
-			Bullet bulletI = bulletIter.next();
 
-			bulletI.mouse( mouseVector.x, mouseVector.y, player.x, player.y );
-			bulletI.Direction(deltaTime);
-		}
 		//delete out of bounds bullets
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
+
 			bulletI.update(deltaTime);
+
 			if(bulletI.remove){
 				bulletIter.remove();
 			}
 		}
+
 
 		//player behavior
 		{
@@ -262,6 +265,7 @@ public class MainGame implements Screen, InputProcessor {
 					enemyDamage=0;
 				}
 			}
+
 		}
 
 	}

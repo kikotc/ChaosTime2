@@ -55,7 +55,7 @@ public class MainGame implements Screen, InputProcessor {
 
 	//enemy variables
 	private Texture enemyImg;
-	private Array<Circle> enemies;
+	private Array<Enemy> enemies;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
 	private int enemySpeed = 240;
@@ -95,7 +95,7 @@ public class MainGame implements Screen, InputProcessor {
 		teleport = new Circle();
 
 		enemyImg = new Texture("enemy.png");
-		enemies = new Array<Circle>();
+		enemies = new Array<Enemy>();
 		spawnEnemy();
 
 		bullets = new ArrayList<Bullet>();
@@ -117,8 +117,8 @@ public class MainGame implements Screen, InputProcessor {
 			bullet.render(batch);
 		}
 		batch.draw(playerImg, player.x, player.y);
-		for(Circle enemy: enemies) {
-			batch.draw(enemyImg, enemy.x, enemy.y);
+		for(Enemy enemy: enemies) {
+			batch.draw(enemyImg, enemy.hitbox.x, enemy.hitbox.y);
 		}
 		batch.draw(foregroundImg, -600, -600);
 		font.draw(batch, Integer.toString(Timer), 1800, 1000);
@@ -160,19 +160,12 @@ public class MainGame implements Screen, InputProcessor {
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
-			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
-				Circle enemyI = EnemyIter.next();
-				if (bulletI.hitbox.overlaps(enemyI)) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-					Enemy.update(deltaTime, true);
+			for (Iterator<Enemy> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
+				Enemy enemyI = EnemyIter.next();
+				if (bulletI.hitbox.overlaps(enemyI.hitbox)) {
 
-=======
-=======
->>>>>>> parent of ecd9060 (Enemy Class WIP)
 					bulletIter.remove();
 					EnemyIter.remove();
->>>>>>> parent of ecd9060 (Enemy Class WIP)
 				}
 			}
 		}
@@ -243,24 +236,25 @@ public class MainGame implements Screen, InputProcessor {
 		//enemy
 		{
 			if (time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
-            for (Circle enemyI : enemies) {
+			for (Enemy enemyI : enemies) {
                 //individual enemy movement
                 Vector2 direction = new Vector2();
-                direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
-                direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
+				direction.x = (player.x + player.radius) - (enemyI.hitbox.x + enemyI.hitbox.radius);
+				direction.y = (player.y + player.radius) - (enemyI.hitbox.y + enemyI.hitbox.radius);
                 direction.nor();
-                enemyI.x += direction.x * enemySpeed * deltaTime;
-                enemyI.y += direction.y * enemySpeed * deltaTime;
-                if (enemyI.x < 0) enemyI.x = 0;
-                if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
-                if (enemyI.y < 0) {enemyI.y = 0;}
+				enemyI.hitbox.x += direction.x * enemySpeed * deltaTime;
+				enemyI.hitbox.y += direction.y * enemySpeed * deltaTime;
+				if (enemyI.hitbox.x < 0) enemyI.hitbox.x = 0;
+				if (enemyI.hitbox.x > 1920 - enemyI.hitbox.radius * 2) enemyI.hitbox.x = 1920 - enemyI.hitbox.radius * 2;
+				if (enemyI.hitbox.y < 0) {enemyI.hitbox.y = 0;}
 
-                if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
+				if (enemyI.hitbox.y > 1080 - enemyI.hitbox.radius * 2) enemyI.hitbox.y = 1080 - enemyI.hitbox.radius * 2;
 
-                //damage
-                if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
+
+				//damage
+				if (enemyI.hitbox.overlaps(player) && (time - lastDamageTime > 250)) {
                     for (int i = 0; i < enemies.size; i++) {
-                        if (enemies.get(i).overlaps(player)) {
+						if (enemies.get(i).hitbox.overlaps(player)) {
                             enemyDamage++;
                         }
                     }
@@ -282,10 +276,7 @@ public class MainGame implements Screen, InputProcessor {
 	}
 
 	private void spawnEnemy() {
-		Circle enemy = new Circle();
-		enemy.radius = 30;
-		enemy.x = MathUtils.random(0, (1980 - enemy.radius * 2));
-		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
+		Enemy enemy = new Enemy();
 		enemies.add(enemy);
 		lastEnemyTime = time;
 	}

@@ -141,8 +141,8 @@ public class MainGame implements Screen, InputProcessor {
 		time = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - startTime;
 		boolean movingX = false, movingY = false;
 
-		relativeMouse.x = mouseVector.x - player.x;
-		relativeMouse.y = mouseVector.y - player.y;
+		relativeMouse.x = mouseVector.x - (player.x + player.radius);
+		relativeMouse.y = mouseVector.y - (player.y + player.radius);
 		relativeMouse.nor();
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
@@ -153,8 +153,8 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 		//shooting
-		if(Gdx.input.isKeyPressed(Keys.F) && time - shootTime > 250 ){
-			bullets.add(new Bullet(player.x, player.y, relativeMouse.x, relativeMouse.y));
+		if(Gdx.input.isTouched() && time - shootTime > 250 ){
+			bullets.add(new Bullet(player.x + player.radius, player.y + player.radius, relativeMouse.x, relativeMouse.y));
 			shootTime = (int)time;
 		}
 
@@ -170,19 +170,15 @@ public class MainGame implements Screen, InputProcessor {
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
-			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();){
+			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
 				Circle enemyI = EnemyIter.next();
-				System.out.println(bulletI.getbX());
-				System.err.println(enemyI.x);
-				if ((bulletI.getbX()>=enemyI.x-25 && bulletI.getbX()<=enemyI.x+25) && (bulletI.getbY()<=enemyI.y +25 && bulletI.getbY()>=enemyI.y-25)){
-					System.out.println("collide");
+				if (bulletI.hitbox.overlaps(enemyI)) {
 					bulletIter.remove();
 					EnemyIter.remove();
 				}
-
 			}
-
 		}
+
 		//player behavior
 		{
 			//controls

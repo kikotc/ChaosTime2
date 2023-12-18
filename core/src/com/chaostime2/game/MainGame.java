@@ -60,6 +60,8 @@ public class MainGame implements Screen, InputProcessor {
 	//enemy variables
 	private Texture enemyImg;
 	private Array<Circle> enemies;
+	private int HEIGHT = 30;
+	private int WIDTH = 30;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
 	private int enemySpeed = 160;
@@ -70,6 +72,8 @@ public class MainGame implements Screen, InputProcessor {
 	public int direction;
 
 
+	//Collision
+	Collision rect;
 	//utilities
 	private BitmapFont font;
 	private int Timer = 60;
@@ -161,7 +165,21 @@ public class MainGame implements Screen, InputProcessor {
 				bulletIter.remove();
 			}
 		}
+		Bullet bulletInstance = new Bullet(12f,12f, 12f,12f);
+		float bPosX = bulletInstance.getbX();
+		float bPosY = bulletInstance.getbY();
+		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+			Bullet bulletI = bulletIter.next();
+			bulletI.update();
+			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();){
+				Circle enemyI = EnemyIter.next();
+				if (bPosX== enemyI.x && bPosY == enemyI.y){
+					bulletIter.remove();
+					EnemyIter.remove();
+				}
+			}
 
+		}
 		//player behavior
 		{
 			//controls
@@ -238,7 +256,8 @@ public class MainGame implements Screen, InputProcessor {
                 enemyI.y += direction.y * enemySpeed * deltaTime;
                 if (enemyI.x < 0) enemyI.x = 0;
                 if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
-                if (enemyI.y < 0) enemyI.y = 0;
+                if (enemyI.y < 0) {enemyI.y = 0;}
+
                 if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
 
                 //damage
@@ -272,6 +291,7 @@ public class MainGame implements Screen, InputProcessor {
 		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
 		enemies.add(enemy);
 		lastEnemyTime = time;
+		this.rect = new Collision( enemy.x, enemy.y, WIDTH, HEIGHT);
 	}
 
 	@Override

@@ -9,7 +9,8 @@ import com.sun.tools.javac.Main;
 
 public class Bullet {
     private static Texture texture;
-
+    float x, y ;
+    public float bX, bY;
     private Vector2 position = new Vector2();
     private Vector2 direction = new Vector2();
     public static final int WIDTH = 2;
@@ -20,6 +21,8 @@ public class Bullet {
     public Bullet(float x, float y, float mX, float mY) {
         position.x = x;
         position.y = y;
+        this.bX = position.x;
+        this.bY = position.y;
         direction.x = mX;
         direction.y = mY;
         this.rect = new Collision(x,y,WIDTH, HEIGHT);
@@ -48,5 +51,11 @@ public class Bullet {
 
     public void render(SpriteBatch batch){
         batch.draw(texture, position.x, position.y);
+    }
+    public float getbX(){
+        return bX;
+    }
+    public float getbY(){
+        return bY;
     }
 }

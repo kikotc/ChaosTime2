@@ -12,22 +12,30 @@ public class Bullet {
 
     private Vector2 position = new Vector2();
     private Vector2 direction = new Vector2();
+    public static final int WIDTH = 2;
+    public static final int HEIGHT = 2;
     public boolean remove = false;
+    Collision rect;
 
     public Bullet(float x, float y, float mX, float mY) {
         position.x = x;
         position.y = y;
         direction.x = mX;
         direction.y = mY;
+        this.rect = new Collision(x,y,WIDTH, HEIGHT);
         texture = new Texture("bullet.png");
     }
 
     public void update () {
-        position.x += direction.x * 400 * Gdx.graphics.getDeltaTime();
-        position.y += direction.y * 400 * Gdx.graphics.getDeltaTime();
+        position.x += direction.x * 250 * Gdx.graphics.getDeltaTime();
+        position.y += direction.y * 250 * Gdx.graphics.getDeltaTime();
         if (position.x > 1920 || position.x < 0 || position.y > 1080 || position.y < 0) {
             remove = true;
+            rect.move(x, y);
         }
+    }
+    public Collision getCollision () {
+        return rect;
     }
 
     /*

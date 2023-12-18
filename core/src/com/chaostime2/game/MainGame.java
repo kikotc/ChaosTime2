@@ -163,8 +163,8 @@ public class MainGame implements Screen, InputProcessor {
 			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
 				Circle enemyI = EnemyIter.next();
 				if (bulletI.hitbox.overlaps(enemyI)) {
-					bulletIter.remove();
-					EnemyIter.remove();
+					Enemy.update(deltaTime, true);
+
 				}
 			}
 		}

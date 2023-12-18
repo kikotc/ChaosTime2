@@ -164,9 +164,12 @@ public class MainGame implements Screen, InputProcessor {
 				Circle enemyI = EnemyIter.next();
 				if (bulletI.hitbox.overlaps(enemyI)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 					Enemy.update(deltaTime, true);
 
 =======
+=======
+>>>>>>> parent of ecd9060 (Enemy Class WIP)
 					bulletIter.remove();
 					EnemyIter.remove();
 >>>>>>> parent of ecd9060 (Enemy Class WIP)

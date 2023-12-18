@@ -111,6 +111,8 @@ public class MainGame implements Screen, InputProcessor {
 		bullets = new ArrayList<Bullet>();
 	}
 
+
+
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(0.639f, 0.647f, 0.659f, 1);
@@ -172,7 +174,7 @@ public class MainGame implements Screen, InputProcessor {
 				Circle enemyI = EnemyIter.next();
 				System.out.println(bulletI.getbX());
 				System.err.println(enemyI.x);
-				if (bulletI.getbX()== enemyI.x && bulletI.getbY()== enemyI.y){
+				if ((bulletI.getbX()>=enemyI.x-25 && bulletI.getbX()<=enemyI.x+25) && (bulletI.getbY()<=enemyI.y +25 && bulletI.getbY()>=enemyI.y-25)){
 					System.out.println("collide");
 					bulletIter.remove();
 					EnemyIter.remove();

@@ -19,6 +19,8 @@ import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static com.badlogic.gdx.math.MathUtils.atan2;
+
 public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
 
@@ -29,8 +31,9 @@ public class MainGame implements Screen, InputProcessor {
 	private Viewport extendViewport;
 	private Texture foregroundImg;
 	private Texture backgroundImg;
-	public Vector3 mouseVector = new Vector3();
-	public Vector2 relativeMouse = new Vector2();
+	private Vector3 mouseVector = new Vector3();
+	private Vector2 relativeMouse = new Vector2();
+	private float angle;
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
 	private long time = 0;
@@ -61,8 +64,9 @@ public class MainGame implements Screen, InputProcessor {
 
 	private int enemyDamage = 0;
 
-	//bullet variable
-	ArrayList<Bullet> bullets;
+	//gun variables
+	private Texture gunImg;
+	private ArrayList<Bullet> bullets;
 
 	//utilities
 	private BitmapFont font;
@@ -98,6 +102,8 @@ public class MainGame implements Screen, InputProcessor {
 		enemies = new Array<Enemy>();
 		spawnEnemy();
 
+		gunImg = new Texture("gun.png");
+
 		bullets = new ArrayList<Bullet>();
 	}
 
@@ -116,6 +122,7 @@ public class MainGame implements Screen, InputProcessor {
 		for(Bullet bullet: bullets){
 			bullet.render(batch);
 		}
+		batch.draw(gunImg, player.x + 40, player.y + 32, 0, 8, 76,16,1,1, angle, 0,0,76,16, false, false);
 		batch.draw(playerImg, player.x, player.y);
 		for(Enemy enemy: enemies) {
 			batch.draw(enemyImg, enemy.hitbox.x, enemy.hitbox.y);
@@ -134,6 +141,8 @@ public class MainGame implements Screen, InputProcessor {
 		relativeMouse.x = mouseVector.x - (player.x + player.radius);
 		relativeMouse.y = mouseVector.y - (player.y + player.radius);
 		relativeMouse.nor();
+		angle = (float) Math.toDegrees(atan2(relativeMouse.y, relativeMouse.x));
+		System.out.println(angle * 57.3);
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
@@ -144,7 +153,7 @@ public class MainGame implements Screen, InputProcessor {
 
 		//shooting
 		if(Gdx.input.isTouched() && time - shootTime > 500){
-			bullets.add(new Bullet(player.x + player.radius, player.y + player.radius, relativeMouse.x, relativeMouse.y));
+			bullets.add(new Bullet(player.x + 35, player.y + 35, relativeMouse.x, relativeMouse.y));
 			shootTime = (int)time;
 		}
 

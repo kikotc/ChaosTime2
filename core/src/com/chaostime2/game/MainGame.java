@@ -1,6 +1,5 @@
 package com.chaostime2.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -20,7 +18,8 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.RecursiveAction;
+
+import static com.badlogic.gdx.math.MathUtils.atan2;
 
 public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
@@ -32,8 +31,9 @@ public class MainGame implements Screen, InputProcessor {
 	private Viewport extendViewport;
 	private Texture foregroundImg;
 	private Texture backgroundImg;
-	public Vector3 mouseVector = new Vector3();
-	public Vector2 relativeMouse = new Vector2();
+	private Vector3 mouseVector = new Vector3();
+	private Vector2 relativeMouse = new Vector2();
+	private float angle;
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
 	private long time = 0;
@@ -43,8 +43,7 @@ public class MainGame implements Screen, InputProcessor {
 	private Circle player;
 	private Vector2 playerDirection = new Vector2();
 	private Vector2 playerVelocity = new Vector2();
-	private int playerSpeed = 180;
-
+	private int playerSpeed = 220;
 
 	//health variables
 	private int playerHealth = 200;
@@ -59,21 +58,21 @@ public class MainGame implements Screen, InputProcessor {
 
 	//enemy variables
 	private Texture enemyImg;
-	private Array<Circle> enemies;
-	private int HEIGHT = 30;
-	private int WIDTH = 30;
+//	private Array<Circle> enemies;
+	//Leo++++
+	private Array<Enemy> enemies;
+	private int enemySpeed = 240;
+	//
+
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
-	private int enemySpeed = 160;
+
 	private int enemyDamage = 0;
 
-	//bullet variable
-	ArrayList<Bullet> bullets;
-	public int direction;
+	//gun variables
+	private Texture gunImg;
+	private ArrayList<Bullet> bullets;
 
-
-	//Collision
-	Collision rect;
 	//utilities
 	private BitmapFont font;
 	private int Timer = 60;
@@ -105,12 +104,14 @@ public class MainGame implements Screen, InputProcessor {
 		teleport = new Circle();
 
 		enemyImg = new Texture("enemy.png");
-		enemies = new Array<Circle>();
-		spawnEnemy();
+
+//		enemies = new Array<Circle>();
+		//Leo++++
+		enemies = new Array<Enemy>();
+		gunImg = new Texture("gun.png");
 
 		bullets = new ArrayList<Bullet>();
 	}
-
 
 
 	@Override
@@ -123,17 +124,23 @@ public class MainGame implements Screen, InputProcessor {
 		batch.begin();
 		batch.draw(backgroundImg, -400, -400);
 		if (teleportPlaced) batch.draw(teleportImg, teleport.x, teleport.y);
-		for(Bullet bullet: bullets){
+		for (Bullet bullet : bullets) {
 			bullet.render(batch);
 		}
+		batch.draw(gunImg, player.x + 40, player.y + 32, 0, 8, 76, 16, 1, 1, angle, 0, 0, 76, 16, false, false);
 		batch.draw(playerImg, player.x, player.y);
-		for(Circle enemy: enemies) {
-			batch.draw(enemyImg, enemy.x, enemy.y);
+//		for(Circle enemy: enemies) {
+//			batch.draw(enemyImg, enemy.x, enemy.y);
+//		}
+		//Leo++++
+		for (Enemy enemy : enemies) {
+			batch.draw(enemyImg, enemy.enemyItem.x, enemy.enemyItem.y);
 		}
+
 		batch.draw(foregroundImg, -600, -600);
 		font.draw(batch, Integer.toString(Timer), 1800, 1000);
 		batch.draw(healthBackgroundImg, 20, 1000);
-		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
+		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth, 0, 410, 40);
 		batch.draw(healthFrameImg, 20, 1000);
 		batch.end();
 
@@ -144,6 +151,8 @@ public class MainGame implements Screen, InputProcessor {
 		relativeMouse.x = mouseVector.x - (player.x + player.radius);
 		relativeMouse.y = mouseVector.y - (player.y + player.radius);
 		relativeMouse.nor();
+		angle = (float) Math.toDegrees(atan2(relativeMouse.y, relativeMouse.x));
+		System.out.println(angle * 57.3);
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
@@ -153,28 +162,39 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 		//shooting
-		if(Gdx.input.isTouched() && time - shootTime > 250 ){
-			bullets.add(new Bullet(player.x + player.radius, player.y + player.radius, relativeMouse.x, relativeMouse.y));
-			shootTime = (int)time;
+		if (Gdx.input.isTouched() && time - shootTime > 500) {
+			bullets.add(new Bullet(player.x + 35, player.y + 35, relativeMouse.x, relativeMouse.y));
+			shootTime = (int) time;
 		}
 
 		//delete out of bounds bullets
-		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+		for (Iterator<Bullet> bulletIter = bullets.iterator(); bulletIter.hasNext(); ) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
-			if(bulletI.remove){
+			if (bulletI.remove) {
 				bulletIter.remove();
 			}
 		}
 
-		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
+		for (Iterator<Bullet> bulletIter = bullets.iterator(); bulletIter.hasNext(); ) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
-			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
-				Circle enemyI = EnemyIter.next();
-				if (bulletI.hitbox.overlaps(enemyI)) {
+//			for (Iterator<Circle> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
+//				Circle enemyI = EnemyIter.next();
+//				if (bulletI.hitbox.overlaps(enemyI)) {
+//					bulletIter.remove();
+//					EnemyIter.remove();
+//				}
+//			}
+			//Leo++++
+			for (Iterator<Enemy> EnemyIter = enemies.iterator(); EnemyIter.hasNext(); ) {
+				Enemy enemyI = EnemyIter.next();
+				if (bulletI.hitbox.overlaps(enemyI.enemyItem)) {
+					enemyI.health--;
 					bulletIter.remove();
-					EnemyIter.remove();
+					if(enemyI.health==0) {
+						EnemyIter.remove();
+					}
 				}
 			}
 		}
@@ -243,121 +263,213 @@ public class MainGame implements Screen, InputProcessor {
 		}
 
 		//enemy
-		{
-			if (time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
-            for (Circle enemyI : enemies) {
-                //individual enemy movement
-                Vector2 direction = new Vector2();
-                direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
-                direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
-                direction.nor();
-                enemyI.x += direction.x * enemySpeed * deltaTime;
-                enemyI.y += direction.y * enemySpeed * deltaTime;
-                if (enemyI.x < 0) enemyI.x = 0;
-                if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
-                if (enemyI.y < 0) {enemyI.y = 0;}
+//		{
+//			if (time - lastEnemyTime > 20000000 / time + 500) spawnEnemy();
+//            for (Circle enemyI : enemies) {
+//                //individual enemy movement
+//                Vector2 direction = new Vector2();
+//                direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
+//                direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
+//                direction.nor();
+//                enemyI.x += direction.x * enemySpeed * deltaTime;
+//                enemyI.y += direction.y * enemySpeed * deltaTime;
+//                if (enemyI.x < 0) enemyI.x = 0;
+//                if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
+//                if (enemyI.y < 0) {enemyI.y = 0;}
+//
+//                if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
+//
+//                //damage
+//                if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
+//                    for (int i = 0; i < enemies.size; i++) {
+//                        if (enemies.get(i).overlaps(player)) {
+//                            enemyDamage++;
+//                        }
+//                    }
+//                    lastDamageTime = time;
+//                    if (enemyDamage > 0) {
+//                        playerHealth -= enemyDamage;
+//                        enemyDamage = 0;
+//                    }
+//                }
+//            }
+//		}
 
-                if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
+		enemyMovement(player.x, player.y, player.radius, time, lastEnemyTime);
+	}
 
-                //damage
-                if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
-                    for (int i = 0; i < enemies.size; i++) {
-                        if (enemies.get(i).overlaps(player)) {
-                            enemyDamage++;
-                        }
-                    }
-                    lastDamageTime = time;
-                    if (enemyDamage > 0) {
-                        playerHealth -= enemyDamage;
-                        enemyDamage = 0;
-                    }
-                }
-            }
+
+
+
+		//WIP OF TIMER
+		public void timeTrack(){
+			Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
+			System.out.println(Timer);
+		}
+
+		private void enemyItemMove(Circle enemyI,float pX,float pY, float pR, long t, long lastEnemyt) {
+
+			//individual enemy movement
+			Vector2 direction = new Vector2();
+			direction.x = (pX + pR) - (enemyI.x + enemyI.radius);
+			direction.y = (pY + pR) - (enemyI.y + enemyI.radius);
+			direction.nor();
+			enemyI.x += direction.x * enemySpeed * Gdx.graphics.getDeltaTime();;
+			enemyI.y += direction.y * enemySpeed * Gdx.graphics.getDeltaTime();;
+			if (enemyI.x < 0) enemyI.x = 0;
+			if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
+			if (enemyI.y < 0) {enemyI.y = 0;}
+
+			if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
+
+			//damage
+			if (enemyI.overlaps(player) && (t - lastDamageTime > 250)) {
+				for (int i = 0; i < enemies.size; i++) {
+					//Leo++
+					if (enemies.get(i).enemyItem
+							.overlaps(player)) {
+						enemyDamage++;
+					}
+				}
+				lastDamageTime = t;
+				if (enemyDamage > 0) {
+					playerHealth -= enemyDamage;
+					enemyDamage = 0;
+				}
+			}
+		}
+		private void enemyMovement(float pX,float pY, float pR, long t, long lastEnemyt){
+			{
+
+				if (t- lastEnemyt > 20000000 / t + 500) spawnEnemy();
+
+//				for (Circle enemyI : enemies) {
+				//Leo++++
+				for (Enemy eItem : enemies) {
+					Circle enemyI= eItem.enemyItem;
+					//enemyItemMove(enemyI.enemyItem, pX, pY, pR, t, lastEnemyt);
+
+					//individual enemy movement
+					Vector2 direction = new Vector2();
+					direction.x = (pX + pR) - (enemyI.x + enemyI.radius);
+					direction.y = (pY + pR) - (enemyI.y + enemyI.radius);
+					direction.nor();
+					enemyI.x += direction.x * enemySpeed * Gdx.graphics.getDeltaTime();;
+					enemyI.y += direction.y * enemySpeed * Gdx.graphics.getDeltaTime();;
+					if (enemyI.x < 0) enemyI.x = 0;
+					if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
+					if (enemyI.y < 0) {enemyI.y = 0;}
+
+					if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
+
+					//damage
+					if (enemyI.overlaps(player) && (t - lastDamageTime > 250)) {
+						for (int i = 0; i < enemies.size; i++) {
+//							if (enemies.get(i).overlaps(player)) {
+							//Leo++
+							if (enemies.get(i).enemyItem.overlaps(player)) {
+								enemyDamage++;
+							}
+						}
+						lastDamageTime = t;
+						if (enemyDamage > 0) {
+							playerHealth -= enemyDamage;
+							enemyDamage = 0;
+						}
+					}
+				}
+			}
+		}
+
+
+
+		//Leo++++++
+		private void spawnEnemy() {
+			int enemy_radius = 30;
+			float enemy_x = MathUtils.random(0, (1980 - enemy_radius * 2));
+			float enemy_y = MathUtils.random(0, (1080 - enemy_radius * 2));
+			Enemy enemy = new Enemy(enemy_x, enemy_y, enemy_radius);
+			enemies.add(enemy);
+			lastEnemyTime = time;
+
+		}
+
+//	private void spawnEnemy() {
+//		Circle enemy = new Circle();
+//		enemy.radius = 30;
+//		enemy.x = MathUtils.random(0, (1980 - enemy.radius * 2));
+//		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
+//		enemies.add(enemy);
+//		lastEnemyTime = time;
+//
+//	}
+
+		@Override
+		public boolean mouseMoved (int screenX, int screenY) {
+			camera.unproject(mouseVector.set(screenX, screenY, 0));
+			return false;
+		}
+
+		@Override
+		public void resize(int width, int height) {
+			viewport.update(width, height, true);
+			extendViewport.update(width, height);
+		}
+
+		@Override
+		public void dispose () {
+			batch.dispose();
+			playerImg.dispose();
+			enemyImg.dispose();
+			foregroundImg.dispose();
+			backgroundImg.dispose();
+			healthBackgroundImg.dispose();
+			healthImg.dispose();
+			healthFrameImg.dispose();
+			teleportImg.dispose();
+			font.dispose();
+		}
+
+		@Override
+		public void show() {}
+		@Override
+		public void hide() {}
+		@Override
+		public void pause() {}
+		@Override
+		public void resume() {}
+		@Override
+		public boolean keyDown(int i) {
+			return false;
+		}
+		@Override
+		public boolean keyUp(int i) {
+			return false;
+		}
+		@Override
+		public boolean keyTyped(char c) {
+			return false;
+		}
+		@Override
+		public boolean touchDown(int i, int i1, int i2, int i3) {
+			return false;
+		}
+		@Override
+		public boolean touchUp(int i, int i1, int i2, int i3) {
+			return false;
+		}
+		@Override
+		public boolean touchCancelled(int i, int i1, int i2, int i3) {
+			return false;
+		}
+		@Override
+		public boolean touchDragged(int i, int i1, int i2) {
+			return false;
+		}
+		@Override
+		public boolean scrolled(float v, float v1) {
+			return false;
 		}
 	}
-
-
-	//WIP OF TIMER
-	public void timeTrack(){
-		Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
-		System.out.println(Timer);
-	}
-
-	private void spawnEnemy() {
-		Circle enemy = new Circle();
-		enemy.radius = 30;
-		enemy.x = MathUtils.random(0, (1980 - enemy.radius * 2));
-		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
-		enemies.add(enemy);
-		lastEnemyTime = time;
-		this.rect = new Collision( enemy.x, enemy.y, WIDTH, HEIGHT);
-	}
-
-	@Override
-	public boolean mouseMoved (int screenX, int screenY) {
-		camera.unproject(mouseVector.set(screenX, screenY, 0));
-		return false;
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		viewport.update(width, height, true);
-		extendViewport.update(width, height);
-	}
-
-	@Override
-	public void dispose () {
-		batch.dispose();
-		playerImg.dispose();
-		enemyImg.dispose();
-		foregroundImg.dispose();
-		healthBackgroundImg.dispose();
-		healthImg.dispose();
-		healthFrameImg.dispose();
-		teleportImg.dispose();
-		font.dispose();
-	}
-
-	@Override
-	public void show() {}
-	@Override
-	public void hide() {}
-	@Override
-	public void pause() {}
-	@Override
-	public void resume() {}
-	@Override
-	public boolean keyDown(int i) {
-		return false;
-	}
-	@Override
-	public boolean keyUp(int i) {
-		return false;
-	}
-	@Override
-	public boolean keyTyped(char c) {
-		return false;
-	}
-	@Override
-	public boolean touchDown(int i, int i1, int i2, int i3) {
-		return false;
-	}
-	@Override
-	public boolean touchUp(int i, int i1, int i2, int i3) {
-		return false;
-	}
-	@Override
-	public boolean touchCancelled(int i, int i1, int i2, int i3) {
-		return false;
-	}
-	@Override
-	public boolean touchDragged(int i, int i1, int i2) {
-		return false;
-	}
-	@Override
-	public boolean scrolled(float v, float v1) {
-		return false;
-	}
-}
 
 

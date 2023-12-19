@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.*;
@@ -24,13 +23,13 @@ import static com.badlogic.gdx.math.MathUtils.atan2;
 public class MainGame implements Screen, InputProcessor {
 	final ChaosTime game;
 
-	//private SpriteBatch batch;
 	public SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	private Viewport extendViewport;
 	private Texture foregroundImg;
 	private Texture backgroundImg;
+	private int shootTime = 0;
 	private Vector3 mouseVector = new Vector3();
 	private Vector2 relativeMouse = new Vector2();
 	private float angle;
@@ -58,20 +57,15 @@ public class MainGame implements Screen, InputProcessor {
 
 	//enemy variables
 	private Texture enemyImg;
-	private Array<Enemy> enemies;
+	private Array<Circle> enemies;
 	private long lastEnemyTime;
 	private long lastDamageTime = 0;
-
+	private int enemySpeed = 240;
 	private int enemyDamage = 0;
 
 	//gun variables
 	private Texture gunImg;
 	private ArrayList<Bullet> bullets;
-
-	//utilities
-	private BitmapFont font;
-	private int Timer = 60;
-	private int shootTime = 0;
 
 	public MainGame(final ChaosTime game) {
 		Gdx.input.setInputProcessor(this);
@@ -81,7 +75,6 @@ public class MainGame implements Screen, InputProcessor {
 		viewport = new FitViewport(1920, 1080, camera);
 		extendViewport = new ExtendViewport(1920, 1080, camera);
 		batch = new SpriteBatch();
-		font = new BitmapFont();
 		foregroundImg = new Texture("foreground.png");
 		backgroundImg = new Texture("background.png");
 
@@ -99,7 +92,7 @@ public class MainGame implements Screen, InputProcessor {
 		teleport = new Circle();
 
 		enemyImg = new Texture("enemy.png");
-		enemies = new Array<Enemy>();
+		enemies = new Array<Circle>();
 		spawnEnemy();
 
 		gunImg = new Texture("gun.png");
@@ -124,11 +117,10 @@ public class MainGame implements Screen, InputProcessor {
 		}
 		batch.draw(gunImg, player.x + 40, player.y + 32, 0, 8, 76,16,1,1, angle, 0,0,76,16, false, false);
 		batch.draw(playerImg, player.x, player.y);
-		for(Enemy enemy: enemies) {
-			batch.draw(enemyImg, enemy.hitbox.x, enemy.hitbox.y);
+		for(Circle enemy: enemies) {
+			batch.draw(enemyImg, enemy.x, enemy.y);
 		}
 		batch.draw(foregroundImg, -600, -600);
-		font.draw(batch, Integer.toString(Timer), 1800, 1000);
 		batch.draw(healthBackgroundImg, 20, 1000);
 		batch.draw(healthImg, 30, 1010, 400 - 2 * playerHealth,0,410,40);
 		batch.draw(healthFrameImg, 20, 1000);
@@ -142,7 +134,6 @@ public class MainGame implements Screen, InputProcessor {
 		relativeMouse.y = mouseVector.y - (player.y + player.radius);
 		relativeMouse.nor();
 		angle = (float) Math.toDegrees(atan2(relativeMouse.y, relativeMouse.x));
-		System.out.println(angle * 57.3);
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
@@ -157,25 +148,18 @@ public class MainGame implements Screen, InputProcessor {
 			shootTime = (int)time;
 		}
 
-		//delete out of bounds bullets
 		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
 			Bullet bulletI = bulletIter.next();
 			bulletI.update();
+			for (Iterator<Circle> enemyIter = enemies.iterator();enemyIter.hasNext();) {
+				Circle enemyI = enemyIter.next();
+				if (bulletI.hitbox.overlaps(enemyI)) {
+					bulletI.remove = true;
+					enemyIter.remove();
+				}
+			}
 			if(bulletI.remove){
 				bulletIter.remove();
-			}
-		}
-
-		for (Iterator<Bullet> bulletIter = bullets.iterator();bulletIter.hasNext();) {
-			Bullet bulletI = bulletIter.next();
-			bulletI.update();
-			for (Iterator<Enemy> EnemyIter = enemies.iterator();EnemyIter.hasNext();) {
-				Enemy enemyI = EnemyIter.next();
-				if (bulletI.hitbox.overlaps(enemyI.hitbox)) {
-
-					bulletIter.remove();
-					EnemyIter.remove();
-				}
 			}
 		}
 
@@ -244,32 +228,25 @@ public class MainGame implements Screen, InputProcessor {
 
 		//enemy
 		{
-			if (time - lastEnemyTime > 20000000 / time + 500){
-				//need to pass values through
-				Enemy enemy = new Enemy(1.1f, 1.1f);
-				enemies.add(enemy);
-				lastEnemyTime = time;
-			}
-			for (Enemy enemyI : enemies) {
+			if (time - lastEnemyTime > 20000000 / time + 200) spawnEnemy();
+			for (Circle enemyI : enemies) {
 
                 //individual enemy movement
-                Vector2 direction = new Vector2();
-				direction.x = (player.x + player.radius) - (enemyI.hitbox.x + enemyI.hitbox.radius);
-				direction.y = (player.y + player.radius) - (enemyI.hitbox.y + enemyI.hitbox.radius);
-                direction.nor();
-
-
-				if (enemyI.hitbox.x < 0) enemyI.hitbox.x = 0;
-				if (enemyI.hitbox.x > 1920 - enemyI.hitbox.radius * 2) enemyI.hitbox.x = 1920 - enemyI.hitbox.radius * 2;
-				if (enemyI.hitbox.y < 0) {enemyI.hitbox.y = 0;}
-
-				if (enemyI.hitbox.y > 1080 - enemyI.hitbox.radius * 2) enemyI.hitbox.y = 1080 - enemyI.hitbox.radius * 2;
-
+				Vector2 direction = new Vector2();
+				direction.x = (player.x + player.radius) - (enemyI.x + enemyI.radius);
+				direction.y = (player.y + player.radius) - (enemyI.y + enemyI.radius);
+				direction.nor();
+				enemyI.x += direction.x * enemySpeed * deltaTime;
+				enemyI.y += direction.y * enemySpeed * deltaTime;
+				if (enemyI.x < 0) enemyI.x = 0;
+				if (enemyI.x > 1920 - enemyI.radius * 2) enemyI.x = 1920 - enemyI.radius * 2;
+				if (enemyI.y < 0) enemyI.y = 0;
+				if (enemyI.y > 1080 - enemyI.radius * 2) enemyI.y = 1080 - enemyI.radius * 2;
 
 				//damage
-				if (enemyI.hitbox.overlaps(player) && (time - lastDamageTime > 250)) {
+				if (enemyI.overlaps(player) && (time - lastDamageTime > 250)) {
                     for (int i = 0; i < enemies.size; i++) {
-						if (enemies.get(i).hitbox.overlaps(player)) {
+						if (enemies.get(i).overlaps(player)) {
                             enemyDamage++;
                         }
                     }
@@ -283,15 +260,13 @@ public class MainGame implements Screen, InputProcessor {
 		}
 	}
 
-
-	//WIP OF TIMER
-	public void timeTrack(){
-		Timer = Timer - (int)(TimeUtils.nanosToMillis(TimeUtils.nanoTime())/1000);
-		System.out.println(Timer);
-	}
-
 	private void spawnEnemy() {
-
+		Circle enemy = new Circle();
+		enemy.radius = 30;
+		enemy.x = MathUtils.random(0, (1980 - enemy.radius * 2));
+		enemy.y = MathUtils.random(0, (1080 - enemy.radius * 2));
+		enemies.add(enemy);
+		lastEnemyTime = time;
 	}
 
 	@Override
@@ -317,7 +292,6 @@ public class MainGame implements Screen, InputProcessor {
 		healthImg.dispose();
 		healthFrameImg.dispose();
 		teleportImg.dispose();
-		font.dispose();
 	}
 
 	@Override

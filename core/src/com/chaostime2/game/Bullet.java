@@ -22,20 +22,12 @@ public class Bullet {
     }
 
     public void update () {
-        hitbox.x += direction.x * 250 * Gdx.graphics.getDeltaTime();
-        hitbox.y += direction.y * 250 * Gdx.graphics.getDeltaTime();
+        hitbox.x += direction.x * 500 * Gdx.graphics.getDeltaTime();
+        hitbox.y += direction.y * 500 * Gdx.graphics.getDeltaTime();
         if (hitbox.x > 1920 || hitbox.x < 0 || hitbox.y > 1080 || hitbox.y < 0) {
             remove = true;
         }
     }
-
-    /*
-    public void mouse ( float mX,  float mY, float px, float py){
-        mouseX = mX;
-        mouseY = mY;
-        playerX = px;
-        playerY = py;
-    }*/
 
     public void render(SpriteBatch batch){
         batch.draw(texture, hitbox.x, hitbox.y);

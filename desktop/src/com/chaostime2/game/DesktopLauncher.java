@@ -12,8 +12,8 @@ public class DesktopLauncher {
 		DisplayMode primaryDesktopMode = Lwjgl3ApplicationConfiguration.getDisplayMode();
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("Chaos Time");
-		config.setFullscreenMode(primaryDesktopMode);
-		//config.setWindowedMode(1920,1080);
+		//config.setFullscreenMode(primaryDesktopMode);
+		config.setWindowedMode(1920,1080);
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 		config.setWindowIcon("player.png");

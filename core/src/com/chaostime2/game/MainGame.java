@@ -29,9 +29,6 @@ public class MainGame implements Screen, InputProcessor {
 	private Viewport extendViewport;
 	private Texture foregroundImg;
 	private Texture backgroundImg;
-	private int shootTime = 0;
-	private Vector3 mouseVector = new Vector3();
-	private Vector2 relativeMouse = new Vector2();
 	private float angle;
 	//subtract 1 so variable time will never be 0 (edge case)
 	private final long startTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) - 1;
@@ -66,6 +63,9 @@ public class MainGame implements Screen, InputProcessor {
 	//gun variables
 	private Texture gunImg;
 	private ArrayList<Bullet> bullets;
+	private int shootTime = 0;
+	private Vector3 mouseVector = new Vector3();
+	private Vector2 relativeMouse = new Vector2();
 
 	public MainGame(final ChaosTime game) {
 		Gdx.input.setInputProcessor(this);
@@ -96,11 +96,8 @@ public class MainGame implements Screen, InputProcessor {
 		spawnEnemy();
 
 		gunImg = new Texture("gun.png");
-
 		bullets = new ArrayList<Bullet>();
 	}
-
-
 
 	@Override
 	public void render(float delta) {
@@ -220,6 +217,7 @@ public class MainGame implements Screen, InputProcessor {
 				if (playerVelocity.y > 0) playerVelocity.y = 0;
 			}
 
+			//player border
 			if (player.x < 0) player.x = 0;
 			if (player.x > 1920 - player.radius * 2) player.x = 1920 - player.radius * 2;
 			if (player.y < 0) player.y = 0;
